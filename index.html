@@ -517,13 +517,13 @@ function pushHist(k,main){
   const e={p:+main.pct.toFixed(3),t:Date.now(),v};
   if(last && Math.abs(last.p-e.p)<0.001){ h[h.length-1]=e; }
   else if(!last || e.p>last.p){ h.push(e); }
-  if(h.length>500) h.splice(0,h.length-500);
+  if(h.length>1200) h.splice(0,h.length-1200);
   store.set(histKey(k),h);
 }
 const feed = () => { const k="ap26_feed_"+S.turno;
   if(!HC[k]){ let f=store.get(k,[]); if(S.turno===1 && !f.some(e=>e.seed===SEEDV)){ f=[...f.filter(e=>!e.seed&&e.t>T1END),...seedFeed1()].sort((a,b)=>b.t-a.t); store.set(k,f); } HC[k]=f; }
   return HC[k]; };
-function pushFeed(type,html,col){ const f=feed(); f.unshift({t:Date.now(),type,html,col}); if(f.length>300) f.length=300; store.set("ap26_feed_"+S.turno,f); S.newEv++; if(type!=="info"&&type!=="tick") alertFor(type,html,col); }
+function pushFeed(type,html,col){ const f=feed(); f.unshift({t:Date.now(),type,html,col}); if(f.length>2000) f.length=2000; store.set("ap26_feed_"+S.turno,f); S.newEv++; if(type!=="info"&&type!=="tick") alertFor(type,html,col); }
 
 /* ============ DESCOBERTA DO CÓDIGO DO 2º TURNO ============ */
 async function discover(){
@@ -614,6 +614,54 @@ function countries(){
   return Object.values(by).map(o=>({...o, main:aggregate(o.list.map(c=>c.d), D().pres.br)})).filter(o=>o.main).sort((a,b)=>b.main.val-a.main.val);
 }
 
+/* ============ HISTÓRICO CENTRAL (gravador na Cloudflare) ============ */
+/* Cole aqui o endereço do seu Worker, por exemplo: "https://apuracao-gravador.seunome.workers.dev" */
+const HIST_SERVER = "https://apuracao-gravador.ranijabali12.workers.dev";
+const SRV = {url:(new URLSearchParams(location.search).get("srv")||HIST_SERVER||"").replace(/\/+$/,""), ok:false, snaps:[], meta:null, last:0, feed:[], lastT:0};
+async function fetchServer(force){
+  if(!SRV.url) return;
+  if(!force && Date.now()-SRV.last<55000 && SRV.ok) return;
+  try{ const r=await fetch(SRV.url+"/historico",{cache:"no-store"}); if(!r.ok) throw 0; const j=await r.json();
+    SRV.last=Date.now(); if(Array.isArray(j.snaps)&&j.snaps.length){ SRV.snaps=j.snaps; SRV.meta=j.meta; SRV.ok=true; applyServer(); } }
+  catch(e){ SRV.ok=false; }
+}
+function applyServer(){
+  const map={}, add=(k,t,x)=>{ if(x&&x.p!=null) (map[k] ||= []).push({p:x.p,t,v:x.v}); };
+  SRV.snaps.forEach(s=>{ add("pres:BR",s.t,s.br); Object.entries(s.r||{}).forEach(([k,x])=>add("pres:"+k,s.t,x)); Object.entries(s.u||{}).forEach(([u,x])=>add("pres:"+u,s.t,x)); Object.entries(s.g||{}).forEach(([u,x])=>add("gov:"+u,s.t,x)); });
+  SRV.lastT=SRV.snaps[SRV.snaps.length-1].t;
+  Object.entries(map).forEach(([k,serie])=>{ const key=`ap26_h_2_${k}`; const local=(HC[key]||store.get(key,[])).filter(e=>e.t>SRV.lastT);
+    const all=[...serie,...local]; HC[key]=all; store.set(key,all); });
+  SRV.feed=eventsFromSnaps(SRV.snaps,SRV.meta);
+}
+function eventsFromSnaps(snaps,meta){
+  const out=[], push=(t,type,html,col)=>out.push({t,type,html,col,srv:true});
+  const pres=meta?.pres||{}, nm=n=>`<b>${esc(shortName(pres[n]?.nm||n))}</b>`, gnm=(u,n)=>`<b>${esc(shortName(meta?.gov?.[u]?.[n]?.nm||n))}</b>`;
+  const pc=colorMap(Object.entries(pres).map(([n,c])=>({n,party:c.party})));
+  const gc=u=>colorMap(Object.entries(meta?.gov?.[u]||{}).map(([n,c])=>({n,party:c.party})));
+  const duel=x=>Object.entries(x.v).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([n,v])=>`${esc(shortName(pres[n]?.nm||n))} ${pf(v)}`).join(" × ");
+  const gduel=(u,x)=>Object.entries(x.v).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([n,v])=>`${esc(shortName(meta?.gov?.[u]?.[n]?.nm||n))} ${pf(v)}`).join(" × ");
+  const lead=x=>x&&Object.entries(x.v).sort((a,b)=>b[1]-a[1])[0]?.[0];
+  let prev=null;
+  for(const s of snaps){
+    if(!prev){ push(s.t,"info",`Primeiros resultados para presidente: ${pf(s.br.p)} apurado — ${duel(s.br)}.`); prev=s; continue; }
+    const b=s.br, a=prev.br;
+    if(b.st>a.st) push(s.t,"tick",`TSE atualizou: +${nf(b.st-a.st)} seções apuradas (${pf(b.p)}). ${duel(b)}.`);
+    const hit=MILES.filter(m=>a.p<m&&b.p>=m).pop(); if(hit!=null) push(s.t,"mile",`Apuração para presidente chega a <b>${hit===100?"100%":pf(b.p)}</b>: ${duel(b)}.`,"#ffcf5a");
+    if(lead(b)!==lead(a)) push(s.t,"leadbr",`${nm(lead(b))} passa à frente no Brasil, com ${pf(b.p)} apurado.`,pc[lead(b)]);
+    if(b.d&&b.d!==a.d) push(s.t,"win",`${nm(b.d)} está eleito presidente.`,pc[b.d]);
+    [...UFS,"zz"].forEach(u=>{ const x=s.u?.[u], y=prev.u?.[u]; if(!x) return;
+      if((!y||y.p<100)&&x.p>=100) push(s.t,"state",`${UFNAME[u]} conclui a apuração para presidente: ${duel(x)}.`,pc[lead(x)]);
+      else if(y&&lead(x)!==lead(y)&&x.p>=5) push(s.t,"lead",`Em ${UFNAME[u]}, ${nm(lead(x))} assume a liderança (${pf(x.p)} apurado).`,pc[lead(x)]); });
+    Object.entries(s.g||{}).forEach(([u,x])=>{ const y=prev.g?.[u], c=gc(u);
+      if(!y){ push(s.t,"info",`Governo de ${UFNAME[u]}: primeiros votos apurados — ${gduel(u,x)}.`); return; }
+      if(x.d&&x.d!==y.d) push(s.t,"win",`${gnm(u,x.d)} está eleito governador de ${UFNAME[u]}.`,c[x.d]);
+      if(y.p<100&&x.p>=100) push(s.t,"state",`Apuração para governador de ${UFNAME[u]} concluída: ${gduel(u,x)}.`,c[lead(x)]);
+      else if(lead(x)!==lead(y)&&x.p>=5) push(s.t,"lead",`Virada em ${UFNAME[u]}: ${gnm(u,lead(x))} passa à frente para governador.`,c[lead(x)]); });
+    prev=s;
+  }
+  return out.reverse();
+}
+
 /* ============ EVENTOS DO FEED ============ */
 const MILES=[1,5,10,20,30,40,50,60,70,80,90,95,99,100];
 function snapshot(){
@@ -657,6 +705,7 @@ async function refresh(){
   if(S.loading) return; S.loading=true; $("#cd").classList.add("spin");
   try{
     const jobs=[fetchPres().catch(e=>{ S.err=e; }), fetchGov().catch(()=>{})];
+    if(S.turno===2) jobs.push(fetchServer().catch(()=>{}));
     if(S.cargo==="pres" && S.scope==="ZZ") jobs.push(fetchExt().catch(()=>{}));
     if(S.cargo==="pol" && S.polKind==="gov") jobs.push(polGov2().catch(()=>{}));
     if(S.city && S.cargo==="pres") jobs.push(fetchCity().catch(()=>{}));
@@ -1101,10 +1150,12 @@ function chartHover(ev){
 
 /* ---------- feed ---------- */
 function feedHTML(){
-  const f=feed().filter(e=>S.feedF==="all"||e.type!=="tick");
-  const items=f.slice(0,120).map((e,i)=>`<div class="ev ${e.type} ${e.seed?"seed":""} ${i<S.newEv?"new":""}"><time>${hhmm(e.t)}</time><span class="d" style="${e.col?`background:${e.col}`:""}"></span><div>${e.html}</div></div>`).join("");
+  const base = (S.turno===2&&SRV.ok) ? [...feed().filter(e=>e.t>SRV.lastT), ...SRV.feed] : feed();
+  const f=base.filter(e=>S.feedF==="all"||e.type!=="tick");
+  const items=f.slice(0,400).map((e,i)=>`<div class="ev ${e.type} ${e.seed?"seed":""} ${i<S.newEv?"new":""}"><time>${hhmm(e.t)}</time><span class="d" style="${e.col?`background:${e.col}`:""}"></span><div>${e.html}</div></div>`).join("");
   return `<div class="card"><h3 style="display:flex;justify-content:space-between;align-items:center">Últimas atualizações
     <span class="modes"><button data-feed="all" aria-pressed="${S.feedF==="all"}">Tudo</button><button data-feed="top" aria-pressed="${S.feedF==="top"}">Destaques</button></span></h3>
+    ${S.turno===2?`<div class="k" style="margin:-4px 0 8px">${SRV.ok?`Histórico completo da noite, gravado a cada minuto pelo gravador central — igual para qualquer pessoa que abrir o site.`:SRV.url?"Gravador central fora do ar no momento: mostrando o que esta página registrou.":"Mostrando o que esta página registrou enquanto esteve aberta."}</div>`:""}
     ${S.turno===1?`<div class="k" style="margin:-4px 0 8px">Noite de 4/10 reconstituída com boletins do TSE publicados pela imprensa; alguns horários são aproximados.</div>`:""}
     <div class="feed">${items||`<div class="k">As novidades da apuração aparecem aqui assim que o TSE publicar: seções apuradas, viradas, estados concluídos e eleitos.</div>`}</div></div>`;
 }
@@ -1749,7 +1800,7 @@ let rz,lastW=window.innerWidth;
 window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(window.innerWidth!==lastW){ lastW=window.innerWidth; drawMap(); drawChartNow(); drawPolMap(); simRun(); syncSide(); } },200); });
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && Date.now()>S.next) refresh(); });
 
-(async()=>{ await discover(); refresh(); discoverDivulga(); })();
+(async()=>{ await discover(); if(SRV.url&&S.turno===2) await fetchServer(true); refresh(); discoverDivulga(); })();
 </script>
 </body>
 </html>
