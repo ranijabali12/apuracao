@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305080F'/%3E%3Crect x='7' y='17' width='4' height='8' rx='1' fill='%23F2C14E'/%3E%3Crect x='14' y='11' width='4' height='14' rx='1' fill='%23F2C14E'/%3E%3Crect x='21' y='6' width='4' height='19' rx='1' fill='%23F2C14E' opacity='.55'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <style>
@@ -574,7 +574,7 @@ svg path.hov{stroke:var(--text);stroke-width:1.8;filter:none}
    PLANTÃO · redesign (out/2026)
    Estúdio de TV às 17h: tinta azul-noite quase preta, uma luz de palco dourada
    vinda de cima, grão de papel por cima de tudo. Geist para a interface,
-   Geist Mono para relógio e horários, Instrument Serif só nas manchetes.
+   tudo em Geist (números tabulares), manchetes em peso alto e espaçamento apertado.
    Movimento: rápido e com propósito (curvas ease-out fortes, nada de
    ease-in-out em entradas), cascata só ao trocar de aba, e o ponto "ao vivo"
    parado até chegar dado novo.
@@ -582,8 +582,7 @@ svg path.hov{stroke:var(--text);stroke-width:1.8;filter:none}
 :root{
   --bg:#05080F; --panel:#0B111F; --panel2:#101829; --panel3:#162034; --line:#172137; --line2:#233050;
   --text:#ECEFF6; --muted:#8D98B4; --dim:#5F6A88; --accent:#F2C14E; --ok:#3CCB7F; --bad:#F0605D;
-  --display:"Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --display:var(--sans); --mono:var(--sans);
   /* curvas: entrada (ease-out forte), movimento na tela (ease-in-out forte), saída (ease-in), mola leve */
   --out:cubic-bezier(.23,1,.32,1); --io:cubic-bezier(.77,0,.175,1); --in:cubic-bezier(.55,.06,.68,.19); --spring:cubic-bezier(.34,1.45,.64,1);
   --shadow-deep:0 1px 0 rgba(255,255,255,.03) inset, 0 24px 60px -24px rgba(1,4,12,.9);
@@ -607,7 +606,7 @@ p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 .top .in{flex-wrap:nowrap;padding:11px 24px;gap:16px}
 .brand{gap:12px;min-width:0;align-items:center}
 .brand b{font:600 19px/1 var(--sans);letter-spacing:-.035em;white-space:nowrap}
-.brand b em{font:italic 400 23px/1 var(--display);letter-spacing:-.01em;color:var(--accent);margin-left:1px}
+.brand b em{font-style:normal;color:var(--accent)}
 .brand .t{white-space:nowrap;font-size:12.5px}
 .ctrls{display:flex;align-items:center;gap:10px;min-width:0}
 .live{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--bad);padding:4px 8px 4px 7px;border-radius:6px;background:rgba(240,96,93,.1);box-shadow:inset 0 0 0 1px rgba(240,96,93,.22)}
@@ -637,11 +636,10 @@ p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 .foot{color:var(--dim);border-top:1px solid var(--line);padding-top:16px;margin-top:32px}
 
 /* manchetes em serifa: o lugar onde a página fala como jornal */
-.maphead h2,.wait2 h2,.wait h2,.boot-mark,.detail .hd b,.citycard .hd b{font-family:var(--display);font-weight:400}
-.maphead h2{font-size:38px;letter-spacing:-.02em;line-height:.95}
-.detail .hd b,.citycard .hd b{font-size:30px;letter-spacing:-.015em}
-.boot-mark{font-size:54px;letter-spacing:-.02em}
-.boot-mark span:nth-child(2){font-style:italic}
+.maphead h2,.wait2 h2,.wait h2,.boot-mark,.detail .hd b,.citycard .hd b{font-family:var(--sans);font-weight:650;letter-spacing:-.045em}
+.maphead h2{font-size:30px;line-height:1}
+.detail .hd b,.citycard .hd b{font-size:24px}
+.boot-mark{font-size:44px}
 
 /* ---------- placar ---------- */
 .board{position:relative;background:var(--panel);box-shadow:var(--shadow-deep)}
@@ -654,7 +652,7 @@ p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 .side .num{font-weight:600;letter-spacing:-.06em}
 .mid{background:linear-gradient(180deg,var(--panel2),var(--panel))}
 .mid .lbl{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.mid .apu b{font-family:var(--mono);font-weight:500;letter-spacing:-.06em}
+.mid .apu b{font-weight:650;letter-spacing:-.05em}
 .tug{height:10px}
 .tug u{background:var(--text);box-shadow:0 0 0 3px var(--panel2)}
 .gapline{font-size:13.5px}
@@ -673,7 +671,7 @@ p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 svg path.hov{transition:opacity .1s linear}
 
 /* ---------- coluna direita, listas, números ---------- */
-.rw .p,.ev time,.ttbar b,.stats b,.dgrid b{font-family:var(--mono);font-weight:500;letter-spacing:-.04em}
+.rw .p,.ttbar b,.stats b,.dgrid b{font-weight:650;letter-spacing:-.03em}
 .stats b{font-size:21px}
 .tug i,.prog i,.mini i,.cc .bar i{transition:width .7s var(--out)}
 .prog{height:3px}
@@ -713,12 +711,12 @@ svg path.hov{transition:opacity .1s linear}
 /* ---------- espera do 2º turno: a única tela que pode respirar ---------- */
 .card.wait2{position:relative;isolation:isolate}
 .wait2 .w-l{position:relative;overflow:hidden}
-.wait2 .w-l:before{content:"25·10";position:absolute;right:-18px;bottom:-46px;z-index:-1;font:italic 400 230px/1 var(--display);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(242,193,78,.09);pointer-events:none}
-.wait2 h2{font-size:64px;line-height:.95;letter-spacing:-.025em;max-width:11ch}
+.wait2 .w-l:before{content:"25·10";position:absolute;right:-18px;bottom:-46px;z-index:-1;font:700 220px/1 var(--sans);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(242,193,78,.09);pointer-events:none}
+.wait2 h2{font-size:56px;line-height:1;max-width:12ch}
 .cdn{gap:8px}
 .cdn .u{position:relative;background:linear-gradient(180deg,var(--panel3),var(--panel2));border-color:var(--line2);border-radius:16px;padding:16px 0 12px}
 .cdn .u:before{content:"";position:absolute;left:10px;right:10px;top:50%;height:1px;background:rgba(5,8,15,.55)}
-.cdn b{position:relative;font:500 54px/1 var(--mono);letter-spacing:-.07em}
+.cdn b{position:relative;font:650 54px/1 var(--sans);letter-spacing:-.05em}
 /* duelo do 1º turno: dois cartões lado a lado, o × no meio como selo */
 .wait2 .pre-duel{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;margin-top:12px}
 .wait2 .pre-duel .vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:grid!important;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--bg);box-shadow:0 0 0 1px var(--line2);font:400 18px/1 var(--display);color:var(--muted)}
@@ -737,8 +735,8 @@ svg path.hov{transition:opacity .1s linear}
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 .pre-c:hover:before,.pre-r:hover:before{opacity:1}
 .pre-r:hover{transform:none}
-.pre-c .pc{font-family:var(--mono);font-weight:500;letter-spacing:-.06em}
-.pre-h{font:400 30px/1 var(--display);letter-spacing:-.015em;margin:40px 0 14px}
+.pre-c .pc{font-weight:650;letter-spacing:-.045em}
+.pre-h{font:650 24px/1.1 var(--sans);letter-spacing:-.035em;margin:40px 0 14px}
 
 @media (max-width:900px){.wait2 h2{font-size:48px}.cdn b{font-size:40px}.maphead h2{font-size:32px}}
 @media (max-width:560px){.wait2 h2{font-size:40px}.cdn b{font-size:30px}.cdn .u{border-radius:12px}.wait2 .w-l:before{font-size:150px;bottom:-30px}.maphead h2{font-size:28px}.side .nm{font-size:19px}}
