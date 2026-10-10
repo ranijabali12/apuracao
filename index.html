@@ -3,11 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0D1F2D">
+<meta name="theme-color" content="#05080F">
 <title>Apuração 2026 · 2º turno</title>
+<meta name="description" content="Apuração ao vivo das eleições de 2026: presidente e governadores, mapa por estado, evolução da contagem e alertas, direto dos dados públicos do TSE.">
+<meta property="og:title" content="Apuração 2026 · ao vivo">
+<meta property="og:description" content="Presidente e governadores, estado por estado, direto dos dados do TSE.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305080F'/%3E%3Crect x='7' y='17' width='4' height='8' rx='1' fill='%23F2C14E'/%3E%3Crect x='14' y='11' width='4' height='14' rx='1' fill='%23F2C14E'/%3E%3Crect x='21' y='6' width='4' height='19' rx='1' fill='%23F2C14E' opacity='.55'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <style>
@@ -565,17 +569,197 @@ svg path.hov{stroke:var(--text);stroke-width:1.8;filter:none}
 @media (max-width:560px){.side .num{font-size:42px}.pic{width:78px;height:96px}.side{padding:16px}.maphead h2{font-size:22px}.wait2 .w-l{padding:24px 18px}.wait2 h2{font-size:32px}.cdn{gap:6px}.cdn b{font-size:28px}.brand b{font-size:17px}}
 .seg button{white-space:nowrap;flex:none}
 @media (max-width:700px){#cargoSeg{max-width:100%;overflow-x:auto;scrollbar-width:none}#cargoSeg::-webkit-scrollbar{display:none}.pre-duel .vs{display:none}.pre-duel{gap:10px}.pre-c{width:100%}}
+
+/* =====================================================================
+   PLANTÃO · redesign (out/2026)
+   Estúdio de TV às 17h: tinta azul-noite quase preta, uma luz de palco dourada
+   vinda de cima, grão de papel por cima de tudo. Geist para a interface,
+   Geist Mono para relógio e horários, Instrument Serif só nas manchetes.
+   Movimento: rápido e com propósito (curvas ease-out fortes, nada de
+   ease-in-out em entradas), cascata só ao trocar de aba, e o ponto "ao vivo"
+   parado até chegar dado novo.
+   ===================================================================== */
+:root{
+  --bg:#05080F; --panel:#0B111F; --panel2:#101829; --panel3:#162034; --line:#172137; --line2:#233050;
+  --text:#ECEFF6; --muted:#8D98B4; --dim:#5F6A88; --accent:#F2C14E; --ok:#3CCB7F; --bad:#F0605D;
+  --display:"Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* curvas: entrada (ease-out forte), movimento na tela (ease-in-out forte), saída (ease-in), mola leve */
+  --out:cubic-bezier(.23,1,.32,1); --io:cubic-bezier(.77,0,.175,1); --in:cubic-bezier(.55,.06,.68,.19); --spring:cubic-bezier(.34,1.45,.64,1);
+  --shadow-deep:0 1px 0 rgba(255,255,255,.03) inset, 0 24px 60px -24px rgba(1,4,12,.9);
+  interpolate-size:allow-keywords;
+}
+
+body{background:var(--bg);
+  background-image:
+    radial-gradient(900px 420px at 50% -180px, rgba(242,193,78,.075), transparent 70%),
+    radial-gradient(1400px 700px at 50% -300px, rgba(48,74,140,.22), transparent 72%);
+  background-repeat:no-repeat;background-attachment:fixed}
+/* grão: tira a cara de "vetor chapado" do fundo escuro */
+body:after{content:"";position:fixed;inset:0;z-index:95;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+::selection{background:rgba(242,193,78,.28);color:#fff}
+.skip{position:fixed;left:16px;top:-60px;z-index:100;background:var(--accent);color:#1d1500;font-weight:600;padding:9px 14px;border-radius:10px;text-decoration:none;transition:top .2s var(--out)}
+.skip:focus{top:12px}
+p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
+
+/* ---------- cabeçalho: uma linha no desktop, duas no celular ---------- */
+.top{background:rgba(5,8,15,.72);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(35,48,80,.6)}
+.top .in{flex-wrap:nowrap;padding:11px 24px;gap:16px}
+.brand{gap:12px;min-width:0;align-items:center}
+.brand b{font:600 19px/1 var(--sans);letter-spacing:-.035em;white-space:nowrap}
+.brand b em{font:italic 400 23px/1 var(--display);letter-spacing:-.01em;color:var(--accent);margin-left:1px}
+.brand .t{white-space:nowrap;font-size:12.5px}
+.ctrls{display:flex;align-items:center;gap:10px;min-width:0}
+.live{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--bad);padding:4px 8px 4px 7px;border-radius:6px;background:rgba(240,96,93,.1);box-shadow:inset 0 0 0 1px rgba(240,96,93,.22)}
+.live i{animation:none;position:relative}
+.live i:after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(240,96,93,.55);opacity:0}
+.live.ping i:after{animation:ping 1.1s var(--out) 1}
+.live.off.ping i:after{animation:none}
+@keyframes ping{0%{opacity:1;box-shadow:0 0 0 0 rgba(240,96,93,.55)}100%{opacity:0;box-shadow:0 0 0 9px rgba(240,96,93,0)}}
+.live.off{color:var(--dim);background:rgba(93,104,134,.1);box-shadow:inset 0 0 0 1px var(--line2)}
+.seg{background:rgba(11,17,31,.8);border-color:var(--line)}
+.seg .ind{background:var(--panel3);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 8px -2px rgba(0,0,0,.6);transition:transform .26s var(--out),width .26s var(--out)}
+.seg button{transition:color .15s var(--out),transform .12s var(--out)}
+.seg button:active,.modes button:active,.scopes button:active,.x:active,.cd:active{transform:scale(.97)}
+.cd span{font:500 12px var(--mono);letter-spacing:-.01em}
+.ref{white-space:nowrap}
+@media (max-width:1380px){.ref{font-size:0;gap:6px}.ref>*{font-size:12.5px}#bell span{display:none}.brand .t{display:none}}
+@media (max-width:1060px){.top .in{flex-wrap:wrap}.brand{margin-right:auto}.ctrls{width:100%;overflow-x:auto;scrollbar-width:none;padding-bottom:1px;-webkit-mask:linear-gradient(90deg,#000 92%,transparent);mask:linear-gradient(90deg,#000 92%,transparent)}.ctrls::-webkit-scrollbar{display:none}.ctrls>*{flex:none}}
+@media (max-width:700px){#cargoSeg{overflow:visible;max-width:none}.top .in{padding:9px 14px 10px;gap:9px}.brand b{font-size:17px}.brand b em{font-size:20px}.seg button{padding:6px 11px;font-size:12.5px}.ref{display:none}}
+
+/* ---------- superfícies ---------- */
+.card,.board,.others,.citybar,.note{border-color:var(--line)}
+.card{background:linear-gradient(180deg,rgba(16,24,41,.9),rgba(11,17,31,.92));box-shadow:var(--shadow-deep)}
+.card h3{font-size:16.5px;letter-spacing:-.025em}
+.note{background:rgba(11,17,31,.75)}
+.eyebrow{font:500 11.5px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.k{color:var(--muted)}
+.foot{color:var(--dim);border-top:1px solid var(--line);padding-top:16px;margin-top:32px}
+
+/* manchetes em serifa: o lugar onde a página fala como jornal */
+.maphead h2,.wait2 h2,.wait h2,.boot-mark,.detail .hd b,.citycard .hd b{font-family:var(--display);font-weight:400}
+.maphead h2{font-size:38px;letter-spacing:-.02em;line-height:.95}
+.detail .hd b,.citycard .hd b{font-size:30px;letter-spacing:-.015em}
+.boot-mark{font-size:54px;letter-spacing:-.02em}
+.boot-mark span:nth-child(2){font-style:italic}
+
+/* ---------- placar ---------- */
+.board{position:relative;background:var(--panel);box-shadow:var(--shadow-deep)}
+.side{transition:background-color .4s var(--out)}
+.side.lead{background:radial-gradient(90% 120% at 50% 130%, color-mix(in oklab, var(--c) 17%, transparent), transparent 65%)}
+.side:after{height:2px}
+.pic{border-radius:16px;border-width:2px;box-shadow:0 18px 40px -18px color-mix(in oklab, var(--c) 60%, transparent)}
+.pic:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(5,8,15,.35));pointer-events:none}
+.side .nm{font-size:27px;letter-spacing:-.035em}
+.side .num{font-weight:600;letter-spacing:-.06em;text-shadow:0 0 40px color-mix(in oklab, var(--c) 28%, transparent)}
+.mid{background:linear-gradient(180deg,var(--panel2),var(--panel))}
+.mid .lbl{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.mid .apu b{font-family:var(--mono);font-weight:500;letter-spacing:-.06em}
+.tug{height:10px}
+.tug u{background:var(--text);box-shadow:0 0 0 3px var(--panel2)}
+.gapline{font-size:13.5px}
+.dec{backdrop-filter:blur(2px)}
+.others{background:rgba(11,17,31,.6)}
+.chip{font-family:var(--sans)}
+
+/* ---------- mapa ---------- */
+.scopes button{transition:color .15s var(--out),border-color .2s var(--out)}
+.mapsvg .stg{transition:opacity .22s var(--out)}
+.mapsvg .stg:hover{filter:brightness(1.18)}
+.mapsvg .stg.sel.pop{animation:popg .42s var(--spring)}
+.mapsvg.intro .stg{animation:stIn .5s var(--out) both;animation-delay:var(--d,0ms)}
+.mapsvg.intro text{animation:fadeIn .3s var(--out) .55s both}
+.mapsvg.swap{animation:mapSwap .24s var(--out)}
+@keyframes mapSwap{from{opacity:.35}}
+.mapsvg rect.lv{transition:transform .9s var(--io)}
+svg path.hov{transition:opacity .1s linear}
+
+/* ---------- coluna direita, listas, números ---------- */
+.rw .p,.ev time,.ttbar b,.stats b,.dgrid b{font-family:var(--mono);font-weight:500;letter-spacing:-.04em}
+.stats b{font-size:21px}
+.tug i,.prog i,.mini i,.cc .bar i{transition:width .7s var(--out)}
+.prog{height:3px}
+.prog i{box-shadow:0 0 12px rgba(242,193,78,.5)}
+.rw{transition:background-color .15s var(--out)}
+.check .chev{transition:transform .22s var(--out)}
+/* "Conferência" abre com altura animada (Chrome/Edge 131+; nos outros abre direto) */
+.check::details-content{block-size:0;overflow:hidden;transition:block-size .26s var(--out),content-visibility .26s allow-discrete}
+.check[open]::details-content{block-size:auto}
+.ev .d{width:2px}
+.tbl tr.click td{transition:background-color .12s var(--out)}
+
+/* ---------- camadas flutuantes ---------- */
+.tip,.chtip{background:rgba(16,24,41,.94);backdrop-filter:blur(12px);border-color:var(--line2);box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -12px rgba(0,0,0,.7)}
+.tip{animation:tipIn .12s var(--out)}
+@keyframes tipIn{from{opacity:0;transform:translateY(2px)}}
+.sug{animation:sugIn .16s var(--out);transform-origin:top center}
+@keyframes sugIn{from{opacity:0;transform:translateY(-4px) scale(.99)}}
+#alertPanel{transform-origin:top right;animation:panelIn .18s var(--out)}
+@keyframes panelIn{from{opacity:0;transform:translateY(-4px) scale(.97)}}
+.modal{animation:fadeIn .18s var(--out)}
+.mbox{animation:boxIn .24s var(--out)}
+@keyframes boxIn{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.tst{background:rgba(22,32,52,.92);backdrop-filter:blur(14px);border:1px solid var(--line2);border-left:1px solid var(--line2);box-shadow:inset 3px 0 0 var(--accent),0 18px 40px -12px rgba(0,0,0,.7);animation:tin2 .28s var(--out)}
+.tst.out{opacity:0;transform:translateX(8px);transition:opacity .18s var(--in),transform .18s var(--in)}
+.btn{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 10px 24px -10px rgba(242,193,78,.55);transition:filter .15s var(--out),transform .15s var(--out),box-shadow .2s var(--out)}
+.btn:active{transform:scale(.97)}
+
+/* ---------- troca de página ---------- */
+::view-transition-old(app){animation:vtOut .14s var(--in) both}
+#app.enter>*{animation:rise .34s var(--out) both}
+#app.enter>*:nth-child(2){animation-delay:.04s}#app.enter>*:nth-child(3){animation-delay:.08s}#app.enter>*:nth-child(n+4){animation-delay:.12s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+#app.soft>*{animation:fadeIn .18s var(--out) both}
+.pre-grid .pre-r{animation:rise .34s var(--out) both}
+
+/* ---------- espera do 2º turno: a única tela que pode respirar ---------- */
+.card.wait2{position:relative;isolation:isolate}
+.wait2 .w-l{position:relative;overflow:hidden}
+.wait2 .w-l:before{content:"25·10";position:absolute;right:-18px;bottom:-46px;z-index:-1;font:italic 400 230px/1 var(--display);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(242,193,78,.09);pointer-events:none}
+.wait2 h2{font-size:64px;line-height:.95;letter-spacing:-.025em;max-width:11ch}
+.cdn{gap:8px}
+.cdn .u{position:relative;background:linear-gradient(180deg,var(--panel3),var(--panel2));border-color:var(--line2);border-radius:16px;padding:16px 0 12px}
+.cdn .u:before{content:"";position:absolute;left:10px;right:10px;top:50%;height:1px;background:rgba(5,8,15,.55)}
+.cdn b{position:relative;font:500 54px/1 var(--mono);letter-spacing:-.07em}
+/* duelo do 1º turno: dois cartões lado a lado, o × no meio como selo */
+.wait2 .pre-duel{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;margin-top:12px}
+.wait2 .pre-duel .vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:grid!important;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--bg);box-shadow:0 0 0 1px var(--line2);font:400 18px/1 var(--display);color:var(--muted)}
+.wait2 .pre-c{flex-direction:column;align-items:flex-start;gap:12px;padding:14px;width:auto}
+.wait2 .pre-c .pic{width:64px;height:78px}
+.wait2 .pre-c .pc{font-size:30px}
+@media (max-width:420px){.wait2 .pre-c .pc{font-size:24px}.wait2 .pre-c .nm{font-size:15px}}
+.cdn .u:last-child{border-color:rgba(242,193,78,.35);box-shadow:0 0 0 4px rgba(242,193,78,.05)}
+.cdn small{font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+/* dígito que muda rola de cima, rápido; só ele mexe */
+.cdn b.flip{animation:roll .32s var(--out)}
+@keyframes roll{from{transform:translateY(-38%);opacity:0;filter:blur(2px)}}
+.pre-c,.pre-r{position:relative;overflow:hidden}
+.pre-c:before,.pre-r:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:opacity .25s var(--out);
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(242,193,78,.55), transparent 60%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.pre-c:hover:before,.pre-r:hover:before{opacity:1}
+.pre-r:hover{transform:none}
+.pre-c .pc{font-family:var(--mono);font-weight:500;letter-spacing:-.06em}
+.pre-h{font:400 30px/1 var(--display);letter-spacing:-.015em;margin:40px 0 14px}
+
+@media (max-width:900px){.wait2 h2{font-size:48px}.cdn b{font-size:40px}.maphead h2{font-size:32px}}
+@media (max-width:560px){.wait2 h2{font-size:40px}.cdn b{font-size:30px}.cdn .u{border-radius:12px}.wait2 .w-l:before{font-size:150px;bottom:-30px}.maphead h2{font-size:28px}.side .nm{font-size:19px}}
+@media (prefers-reduced-motion:reduce){#app.soft>*,.mapsvg.swap,.cdn b.flip,.live.ping i:after,.sug,#alertPanel,.mbox,.tip{animation:none}.check::details-content{transition:none}}
 </style>
 </head>
 <body>
+<a class="skip" href="#app">Pular para o conteúdo</a>
 <header class="top"><div class="in">
-  <div class="brand"><span class="live" id="live"><i></i>ao vivo</span><b>Apuração 2026</b><span class="t" id="turnoLbl">2º turno · 25 de outubro</span></div>
+  <div class="brand"><b>Apuração <em>2026</em></b><span class="live" id="live"><i></i>ao vivo</span><span class="t" id="turnoLbl">2º turno · 25 de outubro</span></div>
+  <div class="ctrls">
   <div class="seg" id="turnoSeg"><button data-t="2" aria-pressed="true">2º turno</button><button data-t="1" aria-pressed="false">1º turno</button></div>
   <div class="seg" id="cargoSeg"><button data-c="pres" aria-pressed="true">Presidente</button><button data-c="gov" aria-pressed="false">Governador</button><button data-c="pol" aria-pressed="false">Quem foi eleito</button><button data-c="ana" aria-pressed="false">Análises</button></div>
   <button class="cd" id="bell" title="Alertas" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5.5 2 6H3c.5-.5 2-2 2-6z"/><path d="M8 16.5a2 2 0 0 0 4 0"/></svg><span>Alertas</span></button>
   <div class="ref">Atualiza a cada
     <select id="ivl" aria-label="Intervalo de atualização"><option value="30" selected>30 s</option><option value="60">1 min</option><option value="120">2 min</option></select>
     <button class="cd" id="cd" title="Atualizar agora"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.8 0 3.3.8 4.3 2.1"/><path d="M12.8 1.5v3.4H9.4"/></svg><span>—</span></button>
+  </div>
   </div>
 </div></header>
 <div id="pbar" class="on"></div>
@@ -1067,6 +1251,8 @@ async function refresh(){
     if(P.br || Object.keys(G.ufs).length) detectEvents();
   }finally{
     S.loading=false; $("#cd").classList.remove("spin"); $("#pbar")?.classList.remove("on"); S.next=Date.now()+S.ivl*1000;
+    /* o ponto "ao vivo" fica parado; só solta uma onda quando chega dado novo do TSE */
+    const lv=$("#live"); if(lv && !RM && !S.err){ lv.classList.remove("ping"); void lv.offsetWidth; lv.classList.add("ping"); }
     const ae=document.activeElement; if(ae && (ae.matches?.("select,input"))){ S.pending=true; } else { const y=window.scrollY; render(); window.scrollTo(0,y); }
   }
 }
@@ -1312,7 +1498,7 @@ async function shareImage(fmt){
 }
 
 /* ============ MOVIMENTO ============ */
-const TWV={}, BWV={}, RM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TWV={}, RM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 const twFmt={p:v=>pf(v),pn:v=>pf(v).replace("%",""),n:v=>nf(v),m:v=>mi(v)};
 const tw=(k,v,f)=> v==null||isNaN(v) ? (f==="n"||f==="m"?"—":pf(null).replace(f==="pn"?"%":"","")) : `<span class="tw" data-k="${k}" data-v="${v}" data-f="${f}">${twFmt[f](v)}</span>`;
 function animateNumbers(root){
@@ -1322,12 +1508,18 @@ function animateNumbers(root){
     const step=t=>{ const x=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-x,3); el.textContent=twFmt[f](a+(to-a)*e); if(x<1&&el.isConnected) requestAnimationFrame(step); };
     requestAnimationFrame(step); });
 }
+/* cada barra lembra a própria largura (pelo elemento, não pela posição): numa atualização ela anda do valor
+   antigo ao novo; uma barra que acabou de aparecer (ex.: abriu um estado) cresce do zero; numa troca de página
+   as barras novas já aparecem prontas */
+const BWM=new WeakMap(); let BNS=null;
 function animateBars(root,ns){
-  const bars=[...root.querySelectorAll(".tug i, .prog i, .mini i, .cc .bar i, .sal i, .rows .mini i")];
-  bars.forEach((el,i)=>{ const k=ns+":"+i, to=el.style.width; if(!to) return; const from=BWV[k]??(S.booted?null:"0%"); BWV[k]=to;
-    if(RM||from==null||from===to) return; el.style.transition="none"; el.style.width=from; });
+  const nav=ns!==BNS; BNS=ns; const go=[];
+  root.querySelectorAll(".tug i, .prog i, .mini i, .cc .bar i, .sal i").forEach(el=>{ const to=el.style.width; if(!to) return;
+    const from=BWM.has(el)?BWM.get(el):(nav&&S.booted?null:"0%"); BWM.set(el,to);
+    if(RM||document.hidden||from==null||from===to) return; el.style.transition="none"; el.style.width=from; go.push([el,to]); });
+  if(!go.length) return;
   root.getBoundingClientRect();
-  requestAnimationFrame(()=>bars.forEach(el=>{ el.style.transition=""; el.style.width=BWV[ns+":"+bars.indexOf(el)]; }));
+  requestAnimationFrame(()=>go.forEach(([el,to])=>{ el.style.transition=""; el.style.width=to; }));
 }
 
 /* ============ RENDER: PEÇAS ============ */
@@ -1460,8 +1652,14 @@ const LVM={};
 /* a onda de entrada roda uma vez por mapa (e de novo quando o contorno real do Brasil termina de carregar) */
 const INTRO=new Set();
 function introMap(root,key){ const sv=root.querySelector("svg.mapsvg"); if(!sv||RM) return; const k=key+(GEO.br?"g":"t"); if(INTRO.has(k)) return; INTRO.add(k); sv.classList.add("intro"); }
+/* o mapa é redesenhado a cada render; quando muda o que ele mostra (modo, turno), faz um crossfade curto em vez de trocar seco.
+   Atualização de dados com o mesmo modo não pisca: os níveis animam sozinhos */
+function swapMap(root,key){ const sv=root.querySelector("svg.mapsvg"); if(!sv) return; const was=root._mk; root._mk=key;
+  if(RM||was==null||was===key||sv.classList.contains("intro")) return; sv.classList.add("swap"); }
 function animateLevels(root,key){
   const rs=[...root.querySelectorAll("rect.lv")]; if(!rs.length) return;
+  /* aba em segundo plano não desenha quadros: sem isso o nível ficaria parado no valor antigo até a pessoa voltar */
+  if(document.hidden){ rs.forEach(r=>{ r.style.transition="none"; r.style.transform=`scaleY(${r.dataset.lv})`; }); LVM[key]=Object.fromEntries(rs.map(r=>[r.parentNode.dataset.uf,+r.dataset.lv])); return; }
   const first=!LVM[key]; const prev=LVM[key]||{}; const xs=rs.map(r=>+r.dataset.cx), mn=Math.min(...xs), mx=Math.max(...xs)||1;
   rs.forEach(r=>{ const uf=r.parentNode.dataset.uf, to=+r.dataset.lv, from=prev[uf]??0;
     r.style.transition="none"; r.style.transform=`scaleY(${from})`;
@@ -2082,18 +2280,25 @@ function render(){
   }
   html += `<p class="foot">Fonte: arquivos públicos do TSE (resultados.tse.jus.br), atualizados direto pelo navegador. O gráfico e o feed são montados por esta página a cada atualização e ficam guardados neste navegador. “Eleito (matematicamente)” é uma conta da página; o TSE confirma depois.</p>`;
   const sig=[S.turno,S.cargo,S.scope,S.polKind,S.gsel,S.reg].join("|"), nav=sig!==S.lastSig; S.lastSig=sig;
+  /* troca de turno ou de aba = página nova (entrada em cascata); trocar região/estado dentro da mesma aba
+     acontece muitas vezes seguidas, então só um fade rápido, sem cascata */
+  const big=S.turno+"|"+S.cargo, bigNav=big!==S.lastBig; S.lastBig=big;
   if(nav){ Object.keys(TWV).forEach(k=>delete TWV[k]); }
+  /* a transição de página chama apply() só no próximo quadro; se nesse meio-tempo outro render() já rodou
+     (ex.: os dados do TSE chegaram), este apply está velho e não pode sobrescrever a tela nova */
+  const rid=S.rid=(S.rid||0)+1;
   const apply=()=>{
+  const late=S.vtPending; S.vtPending=false; if(rid!==S.rid) return;
   /* troca de página: monta tudo de novo. Atualização de dados: só mexe no que mudou, sem piscar nem recarregar */
-  if(nav || app.querySelector(".boot") || !app.firstElementChild){ app.innerHTML=html; }
+  if(nav || late || app.querySelector(".boot") || !app.firstElementChild){ app.innerHTML=html; }
   else { const tpl=document.createElement("main"); tpl.innerHTML=html; morphChildren(app,tpl); }
   S.newEv=0; simUpdate();
-  if(nav&&!RM){ app.classList.remove("enter"); void app.offsetWidth; app.classList.add("enter"); }
+  if((nav||late)&&!RM){ app.classList.remove("enter","soft"); void app.offsetWidth; app.classList.add(bigNav?"enter":"soft"); }
   drawMap(); drawChartNow(); drawPolMap(); simRun(); ttRun(); syncSide();
   animateNumbers(app); animateBars(app,sig); if(S.data[S.turno]?.pres?.br) S.booted=true;
   $("#bell")?.setAttribute("aria-pressed",String(S.alerts.on)); };
   segInd();
-  if(nav && S.shown && !RM && document.startViewTransition){ document.startViewTransition(apply); } else apply();
+  if(nav && bigNav && S.shown && !RM && document.startViewTransition){ S.vtPending=true; document.startViewTransition(apply); } else apply();
   if(!app.querySelector(".boot")) S.shown=true;
 }
 /* atualiza o conteúdo atual para ficar igual ao novo, mantendo os elementos que não mudaram
@@ -2152,7 +2357,7 @@ function drawMap(){
     const br=P.br, colors=colorMap(br.cands), A=br.cands[0]?.n, B=br.cands[1]?.n;
     const focus = S.scope==="BR"?null:REG[S.scope];
     box.innerHTML=brMapSVG(W,H,u=>fillFor(P.ufs[u],colors,S.mode,A,B),focus,S.detail,u=>u.toUpperCase(),"",(S.mode==="win"||S.mode==="adv")?(u=>P.ufs[u]?.val?P.ufs[u].pct/100:null):null);
-    introMap(box,"br"+S.turno+S.scope); animateLevels(box,"br"+S.turno+S.mode);
+    introMap(box,"br"+S.turno+S.scope); swapMap(box,"br"+S.turno+S.mode+S.src); animateLevels(box,"br"+S.turno+S.mode);
     $("#legend").innerHTML=legendHTML(S.mode,colors,br.cands);
   } else if(kind==="world"){
     if(!GEO.world && !GEO.worldTried) loadWorld();
@@ -2165,7 +2370,7 @@ function drawMap(){
     const G=D().gov, m=S.mode==="apu"?"apu":"win"; let defs="";
     const fills={}; UFS.forEach(u=>fills[u]=govFill(u,m,d=>defs+=d));
     box.innerHTML=brMapSVG(W,H,u=>fills[u],null,S.gsel,u=>u.toUpperCase(),defs,m==="win"?(u=>G.ufs[u]?.val?G.ufs[u].pct/100:null):null);
-    introMap(box,"gov"+S.turno); animateLevels(box,"gov"+S.turno);
+    introMap(box,"gov"+S.turno); swapMap(box,"gov"+S.turno+m); animateLevels(box,"gov"+S.turno);
   } else if(kind==="t1"){
     if(!GEO.br && !GEO.brTried) loadBR();
     if(!T1S.data) loadT1States();
@@ -2208,6 +2413,10 @@ document.addEventListener("mousemove",e=>{
   const x=e.clientX+16, y=e.clientY+16;
   tip.style.left=Math.min(window.innerWidth-tip.offsetWidth-8,x)+"px"; tip.style.top=Math.min(window.innerHeight-tip.offsetHeight-8,y)+"px";
 });
+
+/* cartões da espera do 2º turno: a borda acende onde está o cursor (só mouse; no toque não faz nada) */
+document.addEventListener("pointermove",e=>{ if(e.pointerType!=="mouse") return; const c=e.target.closest?.(".pre-r,.pre-c"); if(!c) return;
+  const r=c.getBoundingClientRect(); c.style.setProperty("--mx",(e.clientX-r.left).toFixed(0)+"px"); c.style.setProperty("--my",(e.clientY-r.top).toFixed(0)+"px"); },{passive:true});
 
 /* ============ CLIQUES ============ */
 document.addEventListener("click",e=>{
