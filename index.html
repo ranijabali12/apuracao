@@ -2084,7 +2084,10 @@ function render(){
   const sig=[S.turno,S.cargo,S.scope,S.polKind,S.gsel,S.reg].join("|"), nav=sig!==S.lastSig; S.lastSig=sig;
   if(nav){ Object.keys(TWV).forEach(k=>delete TWV[k]); }
   const apply=()=>{
-  app.innerHTML=html; S.newEv=0; simUpdate();
+  /* troca de página: monta tudo de novo. Atualização de dados: só mexe no que mudou, sem piscar nem recarregar */
+  if(nav || app.querySelector(".boot") || !app.firstElementChild){ app.innerHTML=html; }
+  else { const tpl=document.createElement("main"); tpl.innerHTML=html; morphChildren(app,tpl); }
+  S.newEv=0; simUpdate();
   if(nav&&!RM){ app.classList.remove("enter"); void app.offsetWidth; app.classList.add("enter"); }
   drawMap(); drawChartNow(); drawPolMap(); simRun(); ttRun(); syncSide();
   animateNumbers(app); animateBars(app,sig); if(S.data[S.turno]?.pres?.br) S.booted=true;
@@ -2092,6 +2095,28 @@ function render(){
   segInd();
   if(nav && S.shown && !RM && document.startViewTransition){ document.startViewTransition(apply); } else apply();
   if(!app.querySelector(".boot")) S.shown=true;
+}
+/* atualiza o conteúdo atual para ficar igual ao novo, mantendo os elementos que não mudaram
+   (fotos não recarregam, animações não recomeçam, campo de busca não perde o foco) */
+const OWNED=new Set(["mapBox","chartBox","simMap","ttMap"]);
+function morphNode(from,to){
+  for(const a of [...from.attributes]) if(!to.hasAttribute(a.name)) from.removeAttribute(a.name);
+  for(const a of [...to.attributes]) if(from.getAttribute(a.name)!==a.value) from.setAttribute(a.name,a.value);
+  if(from.id && OWNED.has(from.id)) return;
+  const tag=from.tagName;
+  if(tag==="INPUT"||tag==="TEXTAREA"){ if(document.activeElement!==from && from.value!==to.value) from.value=to.value; if(tag==="INPUT") return; }
+  morphChildren(from,to);
+  if(tag==="SELECT" && document.activeElement!==from && from.value!==to.value) from.value=to.value;
+}
+function morphChildren(from,to){
+  const a=[...from.childNodes], b=[...to.childNodes];
+  for(let i=0;i<b.length;i++){ const n=b[i], o=a[i];
+    if(!o){ from.appendChild(n); continue; }
+    if(o.nodeType!==n.nodeType || o.nodeName!==n.nodeName || (o.nodeType===1 && (o.id!==n.id || (o.dataset.uf||"")!==(n.dataset.uf||"")))){ from.replaceChild(n,o); continue; }
+    if(o.nodeType!==1){ if(o.data!==n.data) o.data=n.data; continue; }
+    morphNode(o,n);
+  }
+  for(let i=b.length;i<a.length;i++) a[i].remove();
 }
 function segInd(){ document.querySelectorAll(".top .seg").forEach(sg=>{ let i=sg.querySelector(".ind"); if(!i){ i=document.createElement("i"); i.className="ind"; sg.appendChild(i); }
   const b=sg.querySelector('button[aria-pressed="true"]'); if(!b) return; i.style.width=b.offsetWidth+"px"; i.style.transform=`translateX(${b.offsetLeft}px)`; }); }
