@@ -131,6 +131,22 @@ svg path.hov.on{opacity:1}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:12px 0 14px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .stats b{display:block;font:600 18px var(--sans)}
 .rows{display:flex;flex-direction:column}
+.eyebrow{display:inline-block;font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.card.wait .pre-h{font:600 18px var(--serif);margin:34px 0 14px}
+.pre-r{cursor:pointer;transition:border-color .2s ease-in-out,background .2s ease-in-out}.pre-r:hover{border-color:var(--accent)}
+.pre-duel{display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap}
+.pre-duel .vs{font:600 26px var(--sans);color:var(--muted)}
+.pre-c{display:flex;gap:14px;align-items:center;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 16px 12px 12px}
+.pre-c .pic{width:84px;height:102px;border-width:3px}
+.pre-c .nm{font:600 18px var(--sans)}
+.pre-c .pc{font:600 30px var(--sans);color:var(--c);margin-top:4px}
+.pre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;text-align:left;max-width:1100px;margin:0 auto}
+.pre-r{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.pre-r b{font-size:14.5px;margin-bottom:2px}
+.pre-r i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.skel-wrap{display:grid;gap:16px}
+.skel{height:180px;border-radius:6px;background:linear-gradient(90deg,var(--panel) 0%,var(--panel2) 50%,var(--panel) 100%);background-size:200% 100%;animation:shim 1.4s ease-in-out infinite}
+@keyframes shim{to{background-position:-200% 0}}
 .modal{position:fixed;inset:0;z-index:80;background:#03060fcc;display:grid;place-items:center;padding:16px}
 .mbox{background:#0e1530;border:1px solid var(--line2);border-radius:10px;padding:20px;max-width:440px;width:100%;box-shadow:0 20px 50px #000c}
 .mt{font:600 19px var(--serif)}
@@ -268,7 +284,7 @@ details.cty>summary::-webkit-details-marker{display:none}
 .tip .r{display:flex;justify-content:space-between;gap:14px}
 .wait{text-align:center;padding:60px 20px}
 .wait h2{font:600 46px/1.05 var(--serif);letter-spacing:-.02em;margin:0 0 10px}
-.wait .cdn{font:500 22px var(--mono);color:var(--accent);margin:16px 0}
+.wait .cdn{font:500 30px var(--mono);color:var(--accent);margin:14px 0 18px;letter-spacing:.02em}
 .btn{border:1px solid var(--text);background:var(--text);color:var(--bg);border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer}
 .foot{color:var(--dim);font-size:12px;margin-top:24px;max-width:90ch}
 @media (max-width:1180px){:root{--side:320px}}
@@ -305,7 +321,7 @@ const U = {
   mun: (e,uf,cd,c) => `${BASE}/${e}/dados/${uf}/${uf}${cd}-c${c}-e${pad6(e)}-u.json`,
   cfg: e => `${BASE}/${e}/config/mun-e${pad6(e)}-cm.json`,
   foto:(e,uf,sq) => `${BASE}/${e}/fotos/${uf}/${sq}.jpeg`,
-  eles:`${BASE}/comum/config/ele-c.json`
+  eles:`https://resultados.tse.jus.br/oficial/comum/config/ele-c.json`
 };
 const GEO_BR = ["https://cdn.jsdelivr.net/gh/codeforamerica/click_that_hood@master/public/data/brazil-states.geojson",
                 "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"];
@@ -314,6 +330,8 @@ const ELEC_DAY2 = new Date("2026-10-25T17:00:00-03:00");
 
 const UFS = ["ac","al","ap","am","ba","ce","df","es","go","ma","mt","ms","mg","pa","pb","pr","pe","pi","rj","rn","rs","ro","rr","sc","sp","se","to"];
 const UFNAME = {ac:"Acre",al:"Alagoas",ap:"Amapá",am:"Amazonas",ba:"Bahia",ce:"Ceará",df:"Distrito Federal",es:"Espírito Santo",go:"Goiás",ma:"Maranhão",mt:"Mato Grosso",ms:"Mato Grosso do Sul",mg:"Minas Gerais",pa:"Pará",pb:"Paraíba",pr:"Paraná",pe:"Pernambuco",pi:"Piauí",rj:"Rio de Janeiro",rn:"Rio Grande do Norte",rs:"Rio Grande do Sul",ro:"Rondônia",rr:"Roraima",sc:"Santa Catarina",sp:"São Paulo",se:"Sergipe",to:"Tocantins",zz:"Exterior"};
+const PREP={ac:'do',al:'de',ap:'do',am:'do',ba:'da',ce:'do',df:'do',es:'do',go:'de',ma:'do',mt:'de',ms:'de',mg:'de',pa:'do',pb:'da',pr:'do',pe:'de',pi:'do',rj:'do',rn:'do',rs:'do',ro:'de',rr:'de',sc:'de',sp:'de',se:'de',to:'do',zz:'do'};
+const deUF = u => `${PREP[u]||'de'} ${UFNAME[u]}`;
 const REG = {N:["ac","ap","am","pa","ro","rr","to"],NE:["al","ba","ce","ma","pb","pe","pi","rn","se"],CO:["df","go","mt","ms"],SE:["es","mg","rj","sp"],S:["pr","rs","sc"]};
 const REGNAME = {BR:"Brasil",N:"Norte",NE:"Nordeste",CO:"Centro-Oeste",SE:"Sudeste",S:"Sul",ZZ:"Exterior"};
 const ufRegion = uf => Object.keys(REG).find(r=>REG[r].includes(uf));
@@ -331,6 +349,7 @@ const P_ = {PT:C("Portugal",620),ES:C("Espanha",724),FR:C("França",250),IT:C("I
  AR:C("Argentina",32),BO:C("Bolívia",68),CL:C("Chile",152),CO:C("Colômbia",170),EC:C("Equador",218),GY:C("Guiana",328),PY:C("Paraguai",600),PE:C("Peru",604),SR:C("Suriname",740),UY:C("Uruguai",858),VE:C("Venezuela",862),
  IL:C("Israel",376),LB:C("Líbano",422),JO:C("Jordânia",400),SY:C("Síria",760),AE:C("Emirados Árabes",784),SA:C("Arábia Saudita",682),QA:C("Catar",634),KW:C("Kuwait",414),IR:C("Irã",364),IQ:C("Iraque",368),EG:C("Egito",818),MA:C("Marrocos",504),DZ:C("Argélia",12),TN:C("Tunísia",788),NG:C("Nigéria",566),GH:C("Gana",288),SN:C("Senegal",686),AO:C("Angola",24),MZ:C("Moçambique",508),ZA:C("África do Sul",710),KE:C("Quênia",404),ET:C("Etiópia",231),CV:C("Cabo Verde",132),GW:C("Guiné-Bissau",624),ST:C("São Tomé e Príncipe",678),NA:C("Namíbia",516),BW:C("Botsuana",72),ZW:C("Zimbábue",716),TZ:C("Tanzânia",834),CI:C("Costa do Marfim",384),CM:C("Camarões",120),GA:C("Gabão",266),CG:C("Congo",178),CD:C("RD Congo",180),GQ:C("Guiné Equatorial",226),TG:C("Togo",768),BJ:C("Benin",204),ZM:C("Zâmbia",894),SD:C("Sudão",729),
  JP:C("Japão",392),CN:C("China",156),HK:C("Hong Kong",344),TW:C("Taiwan",158),KR:C("Coreia do Sul",410),IN:C("Índia",356),PK:C("Paquistão",586),BD:C("Bangladesh",50),LK:C("Sri Lanka",144),ID:C("Indonésia",360),MY:C("Malásia",458),SG:C("Singapura",702),TH:C("Tailândia",764),VN:C("Vietnã",704),PH:C("Filipinas",608),AU:C("Austrália",36),NZ:C("Nova Zelândia",554),TL:C("Timor-Leste",626),KZ:C("Cazaquistão",398),AZ:C("Azerbaijão",31),AM:C("Armênia",51),GE:C("Geórgia",268)};
+Object.assign(P_,{ML:C("Mali",466),BH:C("Bahrein",48),BZ:C("Belize",84),LC:C("Santa Lúcia",662),GN:C("Guiné",324),NP:C("Nepal",524),MW:C("Malaui",454),OM:C("Omã",512),KP:C("Coreia do Norte",408),PS:C("Palestina",275),AG:C("Antígua e Barbuda",28),BIH:C("Bósnia e Herzegovina",70),EE:C("Estônia",233),ALB:C("Albânia",8),LY:C("Líbia",434),BF:C("Burkina Faso",854),MM:C("Mianmar",104)});
 const CITY = {};
 Object.entries({
  PT:"LISBOA,PORTO,FARO,COIMBRA,BRAGA,SETUBAL,FUNCHAL,PONTA DELGADA",ES:"MADRI,MADRID,BARCELONA,VALENCIA,SEVILHA",FR:"PARIS,LYON,MARSELHA,CAIENA,SAINT-GEORGES DE L'OYAPOCK,SAINT-GEORGES,SAINT GEORGES",IT:"ROMA,MILAO,NAPOLES,FLORENCA",DE:"BERLIM,FRANKFURT,MUNIQUE,HAMBURGO,COLONIA,STUTTGART",UK:"LONDRES,EDIMBURGO,MANCHESTER",IE:"DUBLIN",NL:"AMSTERDA,ROTERDA,HAIA",BE:"BRUXELAS",CH:"GENEBRA,ZURIQUE,BERNA",AT:"VIENA",SE:"ESTOCOLMO",NO:"OSLO",DK:"COPENHAGUE",FI:"HELSINQUE",PL:"VARSOVIA",CZ:"PRAGA",HU:"BUDAPESTE",RO:"BUCARESTE",BG:"SOFIA",GR:"ATENAS",RU:"MOSCOU",UA:"KIEV,KIIV,KYIV",TR:"ANCARA,ISTAMBUL",HR:"ZAGREB",RS:"BELGRADO",SI:"LIUBLIANA",SK:"BRATISLAVA",IS:"REYKJAVIK",CY:"NICOSIA",LU:"LUXEMBURGO",
@@ -339,6 +358,8 @@ Object.entries({
  IL:"TEL AVIV,TEL-AVIV",LB:"BEIRUTE",JO:"AMA",SY:"DAMASCO",AE:"DUBAI,ABU DHABI,ABU DABI",SA:"RIADE",QA:"DOHA",KW:"KUWAIT,CIDADE DO KUWAIT",IR:"TEERA",IQ:"BAGDA",EG:"CAIRO",MA:"RABAT",DZ:"ARGEL",TN:"TUNIS",NG:"ABUJA,LAGOS",GH:"ACRA",SN:"DACAR",AO:"LUANDA",MZ:"MAPUTO",ZA:"PRETORIA,CIDADE DO CABO,JOANESBURGO",KE:"NAIROBI",ET:"ADIS ABEBA",CV:"PRAIA",GW:"BISSAU",ST:"SAO TOME",NA:"WINDHOEK",BW:"GABORONE",ZW:"HARARE",TZ:"DAR ES SALAAM",CI:"ABIDJAN",CM:"IAUNDE",GA:"LIBREVILLE",CG:"BRAZZAVILLE",CD:"KINSHASA",GQ:"MALABO",TG:"LOME",BJ:"COTONOU",ZM:"LUSACA",SD:"CARTUM",
  JP:"TOQUIO,NAGOIA,HAMAMATSU,OTA,OIZUMI,OSAKA,KOBE",CN:"PEQUIM,XANGAI,CANTAO",HK:"HONG KONG",TW:"TAIPE",KR:"SEUL",IN:"NOVA DELHI,MUMBAI",PK:"ISLAMABAD",BD:"DACA",LK:"COLOMBO",ID:"JACARTA",MY:"KUALA LUMPUR",SG:"SINGAPURA",TH:"BANGKOK,BANGCOC",VN:"HANOI",PH:"MANILA",AU:"SYDNEY,SIDNEY,MELBOURNE,CAMBERRA,CANBERRA,BRISBANE,PERTH",NZ:"WELLINGTON,AUCKLAND",TL:"DILI",KZ:"ASTANA",AZ:"BAKU",AM:"IEREVA",GE:"TBILISI"
 }).forEach(([k,list])=>list.split(",").forEach(c=>CITY[c]=k));
+Object.entries({ML:"BAMAKO",BH:"BAREIN",BZ:"BELMOPAN",LC:"CASTRIES",GN:"CONACRI",NP:"KATMANDU",MW:"LILONGUE",OM:"MASCATE",KP:"PYONGYANG",PS:"RAMALLAH",AG:"SAINT JOHNS",BIH:"SARAJEVO",EE:"TALIN",ALB:"TIRANA",LY:"TRIPOLI",BF:"UAGADUGU",MM:"YANGON",
+  CI:"ABIDJA",GH:"ACCRA",BD:"DACCA",AM:"IEREVAN",PK:"ISLAMABADE",JM:"KINGSTON-JAMAICA",KW:"KUAITE",AR:"PASO LOS LIBRES",TT:"PORT OF SPAIN",FR:"ST GEORGES DE LOYAPOCK",IT:"MILAO"}).forEach(([k,list])=>list.split(",").forEach(c=>CITY[c]=k));
 
 /* ============ UTILIDADES ============ */
 const $ = s => document.querySelector(s);
@@ -578,12 +599,34 @@ async function fetchPres(){
   P.waiting=false; P.br=parseTSE(brR.value); P.missing=[];
   list.slice(1).forEach((u,i)=>{ const r=res[i+1]; if(r.status==="fulfilled"){ const d=parseTSE(r.value); if(d.ts) P.ufs[u]=d; } else if(!P.ufs[u]) P.missing.push(u); });
 }
+/* resultado oficial do 1º turno para governador (27 UFs) — define quem disputa o 2º turno */
+const T1G={data:null,loading:null};
+function loadT1Gov(){
+  if(T1G.data) return Promise.resolve(T1G.data);
+  return T1G.loading ||= pool(UFS,9,u=>getJSON(U.uf(S.eles[1].est,u,"0003")).then(parseTSE)).then(res=>{ const d={}; UFS.forEach((u,i)=>{ if(res[i]) d[u]=res[i]; }); if(Object.keys(d).length>=20) T1G.data=d; T1G.loading=null; return d; });
+}
+function govFinalists(m){ if(!m) return null; const t2=m.cands.filter(c=>statusOf(c)?.k==="t2"); if(t2.length>=2) return t2.slice(0,2);
+  if(m.pct>=99.99 && m.cands[0] && m.cands[0].pct<=50 && m.cands[1]) return m.cands.slice(0,2); return null; }
+function govRaces(){ const d=T1G.data; if(!d) return null; return UFS.filter(u=>govFinalists(d[u])); }
 async function fetchGov(){
   const E=S.eles[S.turno], G=D().gov;
-  const res=await Promise.allSettled(UFS.map(u=>getJSON(U.uf(E.est,u,"0003"))));
-  res.forEach((r,i)=>{ const u=UFS[i];
-    if(r.status==="fulfilled"){ const d=parseTSE(r.value); if(d.cands.length>=2){ G.ufs[u]=d; delete G.none[u]; } else if(!G.ufs[u]) G.none[u]=true; }
-    else if(r.reason?.status===404||r.reason?.status===403){ if(!G.ufs[u]) G.none[u]=true; } });
+  if(S.turno===1){
+    const res=await Promise.allSettled(UFS.map(u=>getJSON(U.uf(E.est,u,"0003"))));
+    res.forEach((r,i)=>{ const u=UFS[i]; if(r.status==="fulfilled"){ const d=parseTSE(r.value); if(d.cands.length>=2){ G.ufs[u]=d; delete G.none[u]; } } });
+    return;
+  }
+  await loadT1Gov(); const races=govRaces();
+  if(!races){ // sem o 1º turno: cai no comportamento antigo
+    const res=await Promise.allSettled(UFS.map(u=>getJSON(U.uf(E.est,u,"0003"))));
+    res.forEach((r,i)=>{ if(r.status==="fulfilled"){ const d=parseTSE(r.value); if(d.cands.length>=2) G.ufs[UFS[i]]=d; } }); return;
+  }
+  UFS.forEach(u=>{ if(!races.includes(u)) G.none[u]=true; });
+  const res=await Promise.allSettled(races.map(u=>getJSON(U.uf(E.est,u,"0003"))));
+  res.forEach((r,i)=>{ const u=races[i];
+    if(r.status==="fulfilled"){ const d=parseTSE(r.value); if(d.cands.length>=2){ G.ufs[u]=d; return; } }
+    if(!G.ufs[u]||G.ufs[u].pre){ // o TSE ainda não publicou o arquivo do 2º turno deste estado: mostra os finalistas, zerados
+      const f=govFinalists(T1G.data[u]); G.ufs[u]={pct:0,st:0,ts:0,stEff:0,val:0,pre:true,ele:T1G.data[u].ele,
+        cands:f.map(c=>({...c,votes:0,pct:0,st:"",e:"n",raw:{}})),comp:null,abst:null,br:null,nu:null,data:"",hora:""}; } });
 }
 async function fetchExt(){
   const E=S.eles[S.turno], X=D().ext;
@@ -653,9 +696,9 @@ function eventsFromSnaps(snaps,meta){
       if((!y||y.p<100)&&x.p>=100) push(s.t,"state",`${UFNAME[u]} conclui a apuração para presidente: ${duel(x)}.`,pc[lead(x)]);
       else if(y&&lead(x)!==lead(y)&&x.p>=5) push(s.t,"lead",`Em ${UFNAME[u]}, ${nm(lead(x))} assume a liderança (${pf(x.p)} apurado).`,pc[lead(x)]); });
     Object.entries(s.g||{}).forEach(([u,x])=>{ const y=prev.g?.[u], c=gc(u);
-      if(!y){ push(s.t,"info",`Governo de ${UFNAME[u]}: primeiros votos apurados — ${gduel(u,x)}.`); return; }
-      if(x.d&&x.d!==y.d) push(s.t,"win",`${gnm(u,x.d)} está eleito governador de ${UFNAME[u]}.`,c[x.d]);
-      if(y.p<100&&x.p>=100) push(s.t,"state",`Apuração para governador de ${UFNAME[u]} concluída: ${gduel(u,x)}.`,c[lead(x)]);
+      if(!y){ push(s.t,"info",`Governo ${deUF(u)}: primeiros votos apurados — ${gduel(u,x)}.`); return; }
+      if(x.d&&x.d!==y.d) push(s.t,"win",`${gnm(u,x.d)} está eleito governador ${deUF(u)}.`,c[x.d]);
+      if(y.p<100&&x.p>=100) push(s.t,"state",`Apuração para governador ${deUF(u)} concluída: ${gduel(u,x)}.`,c[lead(x)]);
       else if(lead(x)!==lead(y)&&x.p>=5) push(s.t,"lead",`Virada em ${UFNAME[u]}: ${gnm(u,lead(x))} passa à frente para governador.`,c[lead(x)]); });
     prev=s;
   }
@@ -692,10 +735,10 @@ function detectEvents(){
     if((!a||a.pct<100) && c.pct>=100) pushFeed("state",`${UFNAME[u]} conclui a apuração para presidente: ${duel(d)}.`,pc[c.lead]);
     else if(a && a.lead && c.lead!==a.lead && c.pct>=5) pushFeed("lead",`Em ${UFNAME[u]}, ${nm(d,c.lead)} assume a liderança (${pf(d.pct)} apurado).`,pc[c.lead]); });
   Object.entries(cur.gov).forEach(([u,c])=>{ const a=prev.gov?.[u], d=G.ufs[u], gc=colorMap(d.cands);
-    if(!a){ if(c.pct>0) pushFeed("info",`Governo de ${UFNAME[u]}: primeiros votos apurados — ${duel(d)}.`); return; }
-    if(c.dec && c.dec!==a.dec){ const x=decide(d); if(x?.k==="win") pushFeed("win",`${nm(d,x.x.n)} está eleito governador de ${UFNAME[u]}${x.src==="conta"?" (matematicamente)":""}.`,gc[x.x.n]);
+    if(!a){ if(c.pct>0) pushFeed("info",`Governo ${deUF(u)}: primeiros votos apurados — ${duel(d)}.`); return; }
+    if(c.dec && c.dec!==a.dec){ const x=decide(d); if(x?.k==="win") pushFeed("win",`${nm(d,x.x.n)} está eleito governador ${deUF(u)}${x.src==="conta"?" (matematicamente)":""}.`,gc[x.x.n]);
       if(x?.k==="t2") pushFeed("win",`${UFNAME[u]} terá 2º turno para governador: ${nm(d,x.a.n)} × ${nm(d,x.b.n)}.`,"#ffcf5a"); }
-    if(a.pct<100 && c.pct>=100) pushFeed("state",`Apuração para governador de ${UFNAME[u]} concluída: ${duel(d)}.`,gc[c.lead]);
+    if(a.pct<100 && c.pct>=100) pushFeed("state",`Apuração para governador ${deUF(u)} concluída: ${duel(d)}.`,gc[c.lead]);
     else if(a.lead && c.lead!==a.lead && c.pct>=5) pushFeed("lead",`Virada em ${UFNAME[u]}: ${nm(d,c.lead)} passa à frente para governador.`,gc[c.lead]); });
   T.snap=cur; store.set("ap26_snap_"+S.turno,cur);
 }
@@ -1168,12 +1211,26 @@ function tableHTML(rows,cols){
 }
 
 /* ============ RENDER: PÁGINAS ============ */
+const PRE={pres:null,loading:false};
+function loadPre(){ if(PRE.pres||PRE.loading) return; PRE.loading=true;
+  Promise.all([getJSON(U.uf(S.eles[1].fed,"br","0001")).then(parseTSE).catch(()=>null), loadT1Gov().catch(()=>null)]).then(([p])=>{ PRE.pres=p; PRE.loading=false; if(S.turno===2) render(); }); }
+function cdnText(){ const ms=ELEC_DAY2-Date.now(); if(ms<=0) return "Aguardando os primeiros dados do TSE…";
+  const d=Math.floor(ms/864e5), h=Math.floor(ms%864e5/36e5), m=Math.floor(ms%36e5/6e4), s=Math.floor(ms%6e4/1e3);
+  return `${d}d ${String(h).padStart(2,"0")}h ${String(m).padStart(2,"0")}min ${String(s).padStart(2,"0")}s`; }
 function waitHTML(){
-  const ms=ELEC_DAY2-Date.now(), d=Math.floor(ms/864e5), h=Math.floor(ms%864e5/36e5), m=Math.floor(ms%36e5/6e4);
-  return `<div class="card wait"><h2>O 2º turno é em 25 de outubro.</h2>
-    <p class="k">A apuração começa às 17h (Brasília). Deixe esta página aberta: ela começa a puxar os dados do TSE sozinha, desenha o gráfico e preenche o feed.</p>
-    ${ms>0?`<div class="cdn">${d}d ${h}h ${m}min</div>`:`<div class="cdn">Aguardando os primeiros dados do TSE…</div>`}
-    <button class="btn" data-turno="1">Ver como fica com os dados do 1º turno</button></div>`;
+  loadPre();
+  const p=PRE.pres, fin=p?p.cands.filter(c=>statusOf(c)?.k==="t2").slice(0,2):[];
+  const fc=p?colorMap(p.cands):{};
+  const duel = fin.length===2 ? `<div class="pre-duel">${fin.sort((a,b)=>(+a.n||0)-(+b.n||0)).map(c=>`<div class="pre-c" style="--c:${fc[c.n]}"><div class="pic">${foto(c,false,"br",fc[c.n])}</div><div><div class="nm">${esc(shortName(c.nm))}</div><div class="k">${esc(c.party)} · ${esc(c.n)}</div><div class="pc">${pf(c.pct)}</div><div class="k">${nf(c.votes)} votos no 1º turno</div></div></div>`).join('<div class="vs">×</div>')}</div>` : "";
+  const races=govRaces();
+  const rows = races ? races.map(u=>{ const f=govFinalists(T1G.data[u]); const col=colorMap(T1G.data[u].cands);
+    return `<div class="pre-r" data-gogov="${u}" role="button" tabindex="0"><b>${UFNAME[u]} <span class="k" style="float:right">ver →</span></b>${f.map(c=>`<span><i style="background:${col[c.n]}"></i>${esc(shortName(c.nm))} <span class="k">${esc(c.party)} · ${pf(c.pct)}</span></span>`).join("")}</div>`; }).join("") : `<div class="k">Carregando o 1º turno…</div>`;
+  return `<div class="card wait"><span class="eyebrow">2º turno · domingo, 25 de outubro</span><h2>A apuração começa às 17h.</h2>
+    <div class="cdn" id="cdn">${cdnText()}</div>
+    <p class="k" style="max-width:62ch;margin:0 auto">O painel começa a puxar os dados do TSE sozinho. O gravador central registra a noite inteira, então gráfico, feed e "Voltar no tempo" ficam completos para quem abrir a qualquer hora.</p>
+    ${duel?`<h3 class="pre-h">Presidente</h3>${duel}`:""}
+    <h3 class="pre-h">Governador · ${races?races.length:"…"} disputas</h3><div class="pre-grid">${rows}</div>
+    <button class="btn" data-turno="1" style="margin-top:22px">Ver o painel com o 1º turno</button></div>`;
 }
 function checkHTML(br,soma,colors){
   if(!soma) return "";
@@ -1271,8 +1328,10 @@ function govPage(){
     const all=UFS.every(u=>G.none[u]);
     return `<div class="card wait"><h2>${all?"Nenhum estado com 2º turno para governador encontrado.":"Buscando as disputas para governador…"}</h2><p class="k">${all?"Se algum estado tiver 2º turno, ele aparece aqui assim que o TSE publicar os dados.":""}</p></div>`;
   }
-  if(!S.gsel||!G.ufs[S.gsel]) S.gsel=races.includes("sp")?"sp":races[0];
-  const u=S.gsel, d=G.ufs[u], colors=colorMap(d.cands), names={}; d.cands.forEach(c=>names[c.n]=shortName(c.nm));
+  if(!S.gsel||!G.ufs[S.gsel]){ const sz=r=>T1G.data?.[r]?.ele||G.ufs[r].ele||0; S.gsel=races.includes("sp")?"sp":[...races].sort((a,b)=>sz(b)-sz(a))[0]; }
+  const u=S.gsel, d0=G.ufs[u]; const preRef = S.turno===2 && !d0.val && T1G.data?.[u];
+  const d = preRef ? {...T1G.data[u], cands:govFinalists(T1G.data[u])||T1G.data[u].cands.slice(0,2)} : d0;
+  const colors=colorMap(d.cands), names={}; d.cands.forEach(c=>names[c.n]=shortName(c.nm));
   const allCol={}; races.forEach(r=>allCol[r]=colorMap(G.ufs[r].cands));
   const parties={}; races.forEach(r=>{ const t=G.ufs[r].cands[0]; if(t&&G.ufs[r].val) parties[t.party]=allCol[r][t.n]; });
   const rows=races.map(r=>rowHTML(r,UFNAME[r],G.ufs[r],allCol[r],`data-gsel="${r}"`,r===u)).join("");
@@ -1280,8 +1339,8 @@ function govPage(){
   const rowsT=races.map(r=>{ const m=G.ufs[r], c=allCol[r], [a,b]=m.cands;
     return {sort:{name:UFNAME[r],apu:m.pct,lead:a?.nm,lp:a?.pct,sec:b?.nm,sp:b?.pct,adv:(a?.pct||0)-(b?.pct||0),abs:m.pabst},
       html:`<tr class="click" data-gsel="${r}"><td>${UFNAME[r]}</td><td>${pf(m.pct)}</td><td><span class="dot" style="background:${c[a?.n]}"></span>${esc(shortName(a?.nm||""))}${a?tagHTML(a):""}</td><td>${pf(a?.pct)}</td><td>${esc(shortName(b?.nm||""))}</td><td>${pf(b?.pct)}</td><td>${pp((a?.pct||0)-(b?.pct||0))}</td><td>${pf(m.pabst)}</td></tr>`}; });
-  return `${S.turno===2?"":`<div class="note">No 1º turno, todos os 27 estados aparecem aqui. No 2º turno, só os que tiverem disputa.</div>`}
-  ${boardHTML(d,colors,true,u,"Governador · "+UFNAME[u],d,"governador de "+UFNAME[u])}
+  return `${S.turno===2?(preRef?`<div class="note">O 2º turno para governador ${PREP[u]} <b>${UFNAME[u]}</b> é em 25/10. Até lá, o placar mostra o resultado de cada finalista no 1º turno.</div>`:""):`<div class="note">No 1º turno, todos os 27 estados aparecem aqui. No 2º turno, só os que tiverem disputa.</div>`}
+  ${boardHTML(d,colors,true,u,"Governador · "+UFNAME[u],d,"governador "+deUF(u))}
   <div class="main">
     <div class="card center">
       <div class="maphead"><h2>Mapa · governadores</h2><div class="modes">${[["win","Quem lidera"],["apu","Apuração"]].map(([k,t])=>`<button data-mode="${k}" aria-pressed="${(S.mode==="apu"?"apu":"win")===k}">${t}</button>`).join("")}</div></div>
@@ -1503,8 +1562,9 @@ async function polLoad(kind){
   if(S.cargo==="pol") render();
 }
 async function polGov2(){
-  const res=await pool(UFS,8,u=>getJSON(U.uf(S.eles[2].est,u,"0003")).then(parseTSE));
-  UFS.forEach((u,i)=>{ if(res[i]&&res[i].cands.length>=2) POL.gov2[u]=res[i]; });
+  await loadT1Gov(); const list=govRaces()||UFS;
+  const res=await pool(list,8,u=>getJSON(U.uf(S.eles[2].est,u,"0003")).then(parseTSE));
+  list.forEach((u,i)=>{ if(res[i]&&res[i].cands.length>=2) POL.gov2[u]=res[i]; });
 }
 const elected = m => m ? m.cands.filter(c=>statusOf(c)?.k==="win") : [];
 function govResult(u){
@@ -1649,10 +1709,11 @@ function render(){
   if(S.cargo==="pol"){ html=polPage(); }
   else if(S.cargo==="ana"){ html=anaPage(); }
   else if(S.cargo==="pres"){
-    if(!P.br){ html += P.waiting&&S.turno===2 ? waitHTML() : (S.err?"":`<div class="note">Buscando dados do TSE…</div>`); }
+    if(S.turno===2 && (P.waiting || (P.br && !P.br.val))){ html += waitHTML(); }
+    else if(!P.br){ html += S.err?"":`<div class="skel-wrap">${'<div class="skel"></div>'.repeat(3)}</div>`; }
     else html += (S.turno===1?`<div class="note">Você está vendo o <b>1º turno</b> (4/10). Para o dia 25, volte para “2º turno”.</div>`:"")+presPage();
   } else {
-    if(S.turno===2 && P.waiting && !Object.keys(T.gov.ufs).length) html += waitHTML();
+    if(S.turno===2 && !Object.keys(T.gov.ufs).length) html += waitHTML();
     else html += govPage();
   }
   html += `<p class="foot">Fonte: arquivos públicos do TSE (resultados.tse.jus.br), atualizados direto pelo navegador. O gráfico e o feed são montados por esta página a cada atualização e ficam guardados neste navegador. “Eleito (matematicamente)” é uma conta da página; o TSE confirma depois.</p>`;
@@ -1735,7 +1796,7 @@ document.addEventListener("mousemove",e=>{
 document.addEventListener("click",e=>{
   if(!e.target.closest?.(".citybar")){ const sg=$("#citySug"); if(sg) sg.style.display="none"; }
   if(!e.target.closest?.("#alertPanel,#bell")){ const ap=$("#alertPanel"); if(ap) ap.style.display="none"; }
-  const t=e.target.closest("button,[data-uf],[data-gsel],[data-scope],[data-sort],[data-country]");
+  const t=e.target.closest("button,[data-uf],[data-gsel],[data-scope],[data-sort],[data-country],[data-gogov]");
   if(!t){
     /* clique fora de um estado (no fundo do mapa ou em qualquer área da página que não seja o detalhe
        ou um controle) fecha o estado aberto e volta para a visão anterior */
@@ -1763,6 +1824,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.all){ S.chartAll=t.dataset.all==="1"; render(); return; }
   if(t.dataset.feed){ S.feedF=t.dataset.feed; render(); return; }
   if(t.dataset.sort){ const k=t.dataset.sort; S.sort = S.sort.k===k?{k,d:-S.sort.d}:{k,d:k==="name"?1:-1}; render(); return; }
+  if(t.dataset.gogov){ S.cargo="gov"; S.gsel=t.dataset.gogov; S.rowsTop=0; render(); window.scrollTo({top:0,behavior:"smooth"}); return; }
   if(t.hasAttribute("data-close")){ S.detail=null; S.polSel=null; render(); return; }
   if(t.dataset.pk){ S.rowsTop=0; S.polKind=t.dataset.pk; S.polSel=null; render(); return; }
   if(t.dataset.pc){ S.polColor=t.dataset.pc; render(); return; }
@@ -1795,6 +1857,7 @@ setInterval(()=>{
   const nx=$("#nx"); if(nx) nx.textContent=mmss(left);
   const rc=$("#ringc"); if(rc){ const c=2*Math.PI*9; rc.setAttribute("stroke-dashoffset",c*(left/S.ivl)); }
   if(left<=0 && !S.loading) refresh();
+  const cd=$("#cdn"); if(cd) cd.textContent=cdnText();
 },1000);
 let rz,lastW=window.innerWidth;
 window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(window.innerWidth!==lastW){ lastW=window.innerWidth; drawMap(); drawChartNow(); drawPolMap(); simRun(); syncSide(); } },200); });
