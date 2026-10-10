@@ -451,7 +451,9 @@ h1,h2,h3,.brand b,.maphead h2,.card h3,.wait h2,.side .nm,.detail .hd b,.citycar
 .mid .lbl{font-size:13px;color:var(--dim)}
 .mid .apu{color:var(--dim)}
 .mid .apu b{font:650 48px/1 var(--sans);letter-spacing:-.05em}
-.tug{height:8px;border-radius:8px;background:var(--line);margin:10px 0 6px;gap:2px;overflow:visible}
+.tug{height:8px;border-radius:8px;background:var(--line);margin:10px 0 6px;gap:0;overflow:visible}
+.tug i:first-child{border-radius:8px 0 0 8px}.tug i:nth-child(2){border-radius:0 8px 8px 0}
+.tug.none i{opacity:.25}
 .tug i{border-radius:8px}
 .tug u{width:2px;top:-5px;bottom:-5px;border-radius:2px;background:var(--text)}
 .chip{border-radius:var(--r4);padding:3px 7px;font:600 11px/1.1 var(--sans);letter-spacing:0}
@@ -1189,7 +1191,7 @@ function ttRun(){
   const hasStates=Object.keys(st).length>0 || UFS.some(u=>hist("pres:"+u).length);
   $("#ttInfo").innerHTML=`<div class="k">Às <b style="color:var(--text)">${hhmm(e.t)}</b> · ${pf(e.p)} apurado</div>
     ${ns.map(n=>`<div class="ttc" style="--c:${colors[n]||"#888"}"><span>${esc(names[n]||n)}</span><b>${pf(e.v[n])}</b></div>`).join("")}
-    <div class="tug" style="margin:8px 0 12px"><i style="width:${e.v[ns[0]]||0}%;background:${colors[ns[0]]}"></i><i style="flex:1"></i><i style="width:${e.v[ns[1]]||0}%;background:${colors[ns[1]]}"></i><u></u></div>
+    ${tugHTML(e.v[ns[0]],e.v[ns[1]],colors[ns[0]],colors[ns[1]],"margin:8px 0 12px")}
     ${hasStates?`<div class="k">Estados liderados naquele momento: ${Object.entries(lead).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<b style="color:${colors[n]}">${esc(names[n]||n)} ${c}</b>`).join(" · ")}</div>`
       :`<div class="k">Neste turno a página só tem a curva nacional${S.turno===1?" (reconstituída dos boletins)":""}. No 2º turno, o mapa também volta no tempo, estado por estado.</div>`}`;
   const mb=$("#ttMap"); if(mb){ if(!GEO.br&&!GEO.brTried) loadBR(); const W=Math.max(260,mb.clientWidth), H=Math.max(240,mb.clientHeight||W), keep=S.mapSel;
@@ -1352,6 +1354,9 @@ function sideHTML(c,main,colors,est,uf,right){
     <div><div class="nm">${esc(shortName(c.nm))}</div><div class="pt">${esc(c.party)} · ${esc(c.n)}${tagHTML(c)}</div>
     <div class="num">${tw("pc"+c.n,c.pct,"pn")}<i>%</i></div><div class="vt">${tw("vt"+c.n,c.votes,"n")} votos</div></div></div>`;
 }
+/* barra do placar: as duas partes somam sempre 100% (fatia de cada um entre os dois), e o traço marca a metade */
+function tugHTML(pa,pb,ca,cb,style){ pa=+pa||0; pb=+pb||0; const t=pa+pb, a=t?pa/t*100:50, none=!t;
+  return `<div class="tug${none?" none":""}"${style?` style="${style}"`:""}><i style="width:${a}%;background:${ca}"></i><i style="width:${100-a}%;background:${cb}"></i><u></u></div>`; }
 function boardHTML(main,colors,est,uf,label,decMain,decLabel){
   if(!main||!main.cands.length) return `<div class="note">Sem votos apurados ainda.</div>`;
   const top2=main.cands.slice(0,2).sort((a,b)=>(+a.n||0)-(+b.n||0)), [a,b]=top2;
@@ -1361,7 +1366,7 @@ function boardHTML(main,colors,est,uf,label,decMain,decLabel){
     ${sideHTML(a,main,colors,est,uf,false)}
     <div class="mid"><div class="lbl">${esc(label)}</div>
       <div class="apu"><b>${tw("apu",main.pct,"p")}</b>das seções apuradas · ${nf(main.st)} de ${nf(main.ts)}</div>
-      <div class="tug"><i style="width:${a?.pct||0}%;background:${colors[a?.n]}"></i><i style="flex:1"></i><i style="width:${b?.pct||0}%;background:${colors[b?.n]}"></i><u></u></div>
+      ${tugHTML(a?.pct,b?.pct,colors[a?.n],colors[b?.n])}
       ${main.val&&sec?`<div class="gapline"><b>${esc(shortName(lead.nm))}</b> está ${nf(lead.votes-sec.votes)} votos à frente (${pp(lead.pct-sec.pct)}).</div>`:""}
       ${decHTML(decMain||main,decLabel)}
       <div class="share"><span class="k">Compartilhar imagem:</span><button class="x" data-share="post">Post</button><button class="x" data-share="story">Story</button></div>
@@ -1400,6 +1405,8 @@ function apuHTML(main,title,key,ufs){
 }
 function miniBar(main,colors){
   if(!main||!main.val) return `<div class="mini"></div>`;
+  if(S.turno===2 && main.cands.length>=2){ const [x,y]=main.cands.slice(0,2).sort((a,b)=>(+a.n||0)-(+b.n||0)); const t=(x.pct||0)+(y.pct||0); const px=t?(x.pct||0)/t*100:50;
+    return `<div class="mini"><i style="width:${px}%;background:${colors[x.n]||"#888"}"></i><i style="width:${100-px}%;background:${colors[y.n]||"#888"}"></i></div>`; }
   return `<div class="mini">${main.cands.slice(0,S.turno===2?2:4).sort((a,b)=>(+a.n||0)-(+b.n||0)).map(c=>`<i style="width:${c.pct}%;background:${colors[c.n]||"#888"}"></i>`).join("")}</div>`;
 }
 function rowHTML(key,name,main,colors,attr,on){
