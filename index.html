@@ -452,7 +452,7 @@ h1,h2,h3,.brand b,.maphead h2,.card h3,.wait h2,.side .nm,.detail .hd b,.citycar
 .mid .apu{color:var(--dim)}
 .mid .apu b{font:650 48px/1 var(--sans);letter-spacing:-.05em}
 .tug{height:8px;border-radius:8px;background:var(--line);margin:10px 0 6px;gap:0;overflow:visible}
-.tug i:first-child{border-radius:8px 0 0 8px}.tug i:nth-child(2){border-radius:0 8px 8px 0}
+.tug i{border-radius:0!important}.tug i:first-child{border-radius:8px 0 0 8px!important}.tug i:nth-child(3){border-radius:0 8px 8px 0!important}.tug i.rest{background:transparent}
 .tug.none i{opacity:.25}
 .tug i{border-radius:8px}
 .tug u{width:2px;top:-5px;bottom:-5px;border-radius:2px;background:var(--text)}
@@ -1355,8 +1355,10 @@ function sideHTML(c,main,colors,est,uf,right){
     <div class="num">${tw("pc"+c.n,c.pct,"pn")}<i>%</i></div><div class="vt">${tw("vt"+c.n,c.votes,"n")} votos</div></div></div>`;
 }
 /* barra do placar: as duas partes somam sempre 100% (fatia de cada um entre os dois), e o traço marca a metade */
-function tugHTML(pa,pb,ca,cb,style){ pa=+pa||0; pb=+pb||0; const t=pa+pb, a=t?pa/t*100:50, none=!t;
-  return `<div class="tug${none?" none":""}"${style?` style="${style}"`:""}><i style="width:${a}%;background:${ca}"></i><i style="width:${100-a}%;background:${cb}"></i><u></u></div>`; }
+function tugHTML(pa,pb,ca,cb,style){ pa=+pa||0; pb=+pb||0; const t=pa+pb, none=!t;
+  /* só os dois na disputa (2º turno): as partes somam 100%. Com outros candidatos (1º turno), cada um ocupa o seu % real e o resto fica cinza no meio */
+  const two=t>=99.5, a=none?50:two?pa/t*100:pa, b=none?50:two?100-a:pb;
+  return `<div class="tug${none?" none":""}"${style?` style="${style}"`:""}><i style="width:${a}%;background:${ca}"></i><i class="rest" style="flex:1"></i><i style="width:${b}%;background:${cb}"></i><u></u></div>`; }
 function boardHTML(main,colors,est,uf,label,decMain,decLabel){
   if(!main||!main.cands.length) return `<div class="note">Sem votos apurados ainda.</div>`;
   const top2=main.cands.slice(0,2).sort((a,b)=>(+a.n||0)-(+b.n||0)), [a,b]=top2;
@@ -1405,8 +1407,8 @@ function apuHTML(main,title,key,ufs){
 }
 function miniBar(main,colors){
   if(!main||!main.val) return `<div class="mini"></div>`;
-  if(S.turno===2 && main.cands.length>=2){ const [x,y]=main.cands.slice(0,2).sort((a,b)=>(+a.n||0)-(+b.n||0)); const t=(x.pct||0)+(y.pct||0); const px=t?(x.pct||0)/t*100:50;
-    return `<div class="mini"><i style="width:${px}%;background:${colors[x.n]||"#888"}"></i><i style="width:${100-px}%;background:${colors[y.n]||"#888"}"></i></div>`; }
+  if(S.turno===2 && main.cands.length>=2){ const [x,y]=main.cands.slice(0,2).sort((a,b)=>(+a.n||0)-(+b.n||0)); const t=(x.pct||0)+(y.pct||0), two=t>=99.5, px=two?(x.pct||0)/t*100:(x.pct||0), py=two?100-px:(y.pct||0);
+    return `<div class="mini"><i style="width:${px}%;background:${colors[x.n]||"#888"}"></i><i style="flex:1"></i><i style="width:${py}%;background:${colors[y.n]||"#888"}"></i></div>`; }
   return `<div class="mini">${main.cands.slice(0,S.turno===2?2:4).sort((a,b)=>(+a.n||0)-(+b.n||0)).map(c=>`<i style="width:${c.pct}%;background:${colors[c.n]||"#888"}"></i>`).join("")}</div>`;
 }
 function rowHTML(key,name,main,colors,attr,on){
