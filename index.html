@@ -594,17 +594,16 @@ body{background:var(--bg);
   background-image:
     radial-gradient(900px 420px at 50% -180px, rgba(242,193,78,.075), transparent 70%),
     radial-gradient(1400px 700px at 50% -300px, rgba(48,74,140,.22), transparent 72%);
-  background-repeat:no-repeat;background-attachment:fixed}
-/* grão: tira a cara de "vetor chapado" do fundo escuro */
-body:after{content:"";position:fixed;inset:0;z-index:95;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  background-repeat:no-repeat}
+/* sem camada de grão em tela cheia: um overlay fixo com mix-blend-mode obrigava o navegador a recompor a página
+   inteira a cada quadro de animação do mapa (era o que deixava a entrada do mapa e a rolagem lentas) */
 ::selection{background:rgba(242,193,78,.28);color:#fff}
 .skip{position:fixed;left:16px;top:-60px;z-index:100;background:var(--accent);color:#1d1500;font-weight:600;padding:9px 14px;border-radius:10px;text-decoration:none;transition:top .2s var(--out)}
 .skip:focus{top:12px}
 p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 
 /* ---------- cabeçalho: uma linha no desktop, duas no celular ---------- */
-.top{background:rgba(5,8,15,.72);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(35,48,80,.6)}
+.top{background:rgba(5,8,15,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(35,48,80,.6)}
 .top .in{flex-wrap:nowrap;padding:11px 24px;gap:16px}
 .brand{gap:12px;min-width:0;align-items:center}
 .brand b{font:600 19px/1 var(--sans);letter-spacing:-.035em;white-space:nowrap}
@@ -652,27 +651,25 @@ p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 .pic{border-radius:16px;border-width:2px;box-shadow:0 18px 40px -18px color-mix(in oklab, var(--c) 60%, transparent)}
 .pic:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(5,8,15,.35));pointer-events:none}
 .side .nm{font-size:27px;letter-spacing:-.035em}
-.side .num{font-weight:600;letter-spacing:-.06em;text-shadow:0 0 40px color-mix(in oklab, var(--c) 28%, transparent)}
+.side .num{font-weight:600;letter-spacing:-.06em}
 .mid{background:linear-gradient(180deg,var(--panel2),var(--panel))}
 .mid .lbl{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .mid .apu b{font-family:var(--mono);font-weight:500;letter-spacing:-.06em}
 .tug{height:10px}
 .tug u{background:var(--text);box-shadow:0 0 0 3px var(--panel2)}
 .gapline{font-size:13.5px}
-.dec{backdrop-filter:blur(2px)}
 .others{background:rgba(11,17,31,.6)}
 .chip{font-family:var(--sans)}
 
 /* ---------- mapa ---------- */
 .scopes button{transition:color .15s var(--out),border-color .2s var(--out)}
 .mapsvg .stg{transition:opacity .22s var(--out)}
-.mapsvg .stg:hover{filter:brightness(1.18)}
 .mapsvg .stg.sel.pop{animation:popg .42s var(--spring)}
-.mapsvg.intro .stg{animation:stIn .5s var(--out) both;animation-delay:var(--d,0ms)}
-.mapsvg.intro text{animation:fadeIn .3s var(--out) .55s both}
+.mapsvg.intro .stg{animation:fadeIn .28s var(--out) both;animation-delay:var(--d,0ms)}
+.mapsvg.intro text{animation:fadeIn .25s var(--out) .35s both}
 .mapsvg.swap{animation:mapSwap .24s var(--out)}
 @keyframes mapSwap{from{opacity:.35}}
-.mapsvg rect.lv{transition:transform .9s var(--io)}
+.mapsvg rect.lv{transition:transform .6s var(--out)}
 svg path.hov{transition:opacity .1s linear}
 
 /* ---------- coluna direita, listas, números ---------- */
@@ -733,7 +730,7 @@ svg path.hov{transition:opacity .1s linear}
 .cdn small{font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
 /* dígito que muda rola de cima, rápido; só ele mexe */
 .cdn b.flip{animation:roll .32s var(--out)}
-@keyframes roll{from{transform:translateY(-38%);opacity:0;filter:blur(2px)}}
+@keyframes roll{from{transform:translateY(-38%);opacity:0}}
 .pre-c,.pre-r{position:relative;overflow:hidden}
 .pre-c:before,.pre-r:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:opacity .25s var(--out);
   background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(242,193,78,.55), transparent 60%);
@@ -1627,7 +1624,7 @@ function brMapSVG(W,H,fillOf,focus,sel,labelOf,defs,levelOf){
   const gcls = uf => `stg ${focus&&!focus.includes(uf)?"dim":""} ${sel?(sel===uf?"sel"+(anim?" pop":""):"bg"):""}`;
   let clip="", g="";
   const one=(uf,d,box,cx)=>{
-    const full=fillOf(uf); const lv=levelOf?levelOf(uf):null; const dl=` style="--d:${Math.round(clamp(cx/W,0,1)*520)}ms"`;
+    const full=fillOf(uf); const lv=levelOf?levelOf(uf):null; const dl=` style="--d:${Math.round(clamp(cx/W,0,1)*360)}ms"`;
     if(lv==null||full===NODATA||String(full).startsWith("url(")) return `<g class="${gcls(uf)}" data-uf="${uf}"${dl}><path class="st" d="${d}" fill="${full}"/></g>`;
     clip+=`<clipPath id="cp_${uf}"><path d="${d}"/></clipPath>`;
     const [[x0,y0],[x1,y1]]=box;
@@ -1663,7 +1660,7 @@ function animateLevels(root,key){
   const first=!LVM[key]; const prev=LVM[key]||{}; const xs=rs.map(r=>+r.dataset.cx), mn=Math.min(...xs), mx=Math.max(...xs)||1;
   rs.forEach(r=>{ const uf=r.parentNode.dataset.uf, to=+r.dataset.lv, from=prev[uf]??0;
     r.style.transition="none"; r.style.transform=`scaleY(${from})`;
-    if(first) r.style.transitionDelay=`${((+r.dataset.cx-mn)/(mx-mn||1)*700).toFixed(0)}ms`; });
+    if(first) r.style.transitionDelay=`${((+r.dataset.cx-mn)/(mx-mn||1)*400).toFixed(0)}ms`; });
   root.getBoundingClientRect();
   requestAnimationFrame(()=>rs.forEach(r=>{ r.style.transition=""; r.style.transform=`scaleY(${r.dataset.lv})`; }));
   LVM[key]=Object.fromEntries(rs.map(r=>[r.parentNode.dataset.uf,+r.dataset.lv]));
