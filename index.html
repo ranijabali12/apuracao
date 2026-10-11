@@ -1245,6 +1245,9 @@ function govFinalists(m){ if(!m) return null; const t2=m.cands.filter(c=>statusO
    estado já decidido = cor do partido do governador eleito no 1º turno */
 function govFill(u,m,addDef){
   const G=D().gov, g=G.ufs[u];
+  /* 1º turno: estado que foi para o 2º turno fica listrado com as cores dos dois finalistas */
+  if(g&&g.val&&S.turno===1&&m==="win"){ const d=decide(g,1); if(d?.k==="t2"){ const col=colorMap(g.cands);
+    addDef(`<pattern id="gs1_${u}" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><rect width="8" height="8" fill="${col[d.a.n]}"/><rect width="4" height="8" fill="${col[d.b.n]}"/></pattern>`); return `url(#gs1_${u})`; } }
   if(g&&g.val) return fillFor(g,colorMap(g.cands),m);
   if(m==="apu") return g?mix(PANEL,"#F2C14E",.28):NODATA;
   const t=T1G.data?.[u]; if(!t) return g?mix(PANEL,"#F2C14E",.35):NODATA;
@@ -2193,7 +2196,7 @@ function govPage(){
       <div class="maphead"><h2>Mapa · governadores</h2><div class="modes">${[["win","Quem lidera"],["apu","Apuração"]].map(([k,t])=>`<button data-mode="${k}" aria-pressed="${(S.mode==="apu"?"apu":"win")===k}">${t}</button>`).join("")}</div></div>
       <div class="k" style="margin-bottom:6px">${S.turno===2?`${races.length} ${races.length>1?"estados têm":"estado tem"} 2º turno, em listras com as cores dos finalistas até a contagem começar. Nos outros, a cor é a do partido do governador eleito no 1º turno.`:"Toque num estado para ver a disputa."}</div>
       <div id="mapBox" data-map="gov"></div>
-      <div class="legend">${Object.entries(parties).map(([p,col])=>`<span><i style="background:${col}"></i>${esc(p)} na frente</span>`).join("")}${S.turno===2?govLegend():`<span><i style="background:${NODATA}"></i>sem votos</span>`}</div>
+      <div class="legend">${Object.entries(parties).map(([p,col])=>`<span><i style="background:${col}"></i>${esc(p)} na frente</span>`).join("")}${S.turno===2?govLegend():`<span><i style="background:repeating-linear-gradient(45deg,var(--text) 0 3px,var(--panel) 3px 6px)"></i>foi para o 2º turno (listras = os dois finalistas)</span><span><i style="background:${NODATA}"></i>sem votos</span>`}</div>
     </div>
     <div class="card right">${apuHTML(d,"Apuração · "+UFNAME[u],"gov:"+u,null)}<h3>${S.turno===2?"Estados em disputa":"Estados"}</h3><div class="rows">${rows}</div></div>
   </div>
