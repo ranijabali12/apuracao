@@ -622,7 +622,7 @@ p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
 .seg button:active,.modes button:active,.scopes button:active,.x:active,.cd:active{transform:scale(.97)}
 .cd span{font:500 12px var(--mono);letter-spacing:-.01em}
 .ref{white-space:nowrap}
-@media (max-width:1380px){.ref{font-size:0;gap:6px}.ref>*{font-size:12.5px}#bell span{display:none}.brand .t{display:none}}
+@media (max-width:1380px){.ref{font-size:0;gap:6px}.ref>*{font-size:12.5px}#bell span,#tvBtn span{display:none}.brand .t{display:none}}
 @media (max-width:1060px){.top .in{flex-wrap:wrap}.brand{margin-right:auto}.ctrls{width:100%;overflow-x:auto;scrollbar-width:none;padding-bottom:1px;-webkit-mask:linear-gradient(90deg,#000 92%,transparent);mask:linear-gradient(90deg,#000 92%,transparent)}.ctrls::-webkit-scrollbar{display:none}.ctrls>*{flex:none}}
 @media (max-width:700px){#cargoSeg{overflow:visible;max-width:none}.top .in{padding:9px 14px 10px;gap:9px}.brand b{font-size:17px}.brand b em{font-size:20px}.seg button{padding:6px 11px;font-size:12.5px}.ref{display:none}}
 
@@ -738,6 +738,50 @@ svg path.hov{transition:opacity .1s linear}
 .pre-c .pc{font-weight:650;letter-spacing:-.045em}
 .pre-h{font:650 24px/1.1 var(--sans);letter-spacing:-.035em;margin:40px 0 14px}
 
+
+/* ---------- placar fixo no topo (aparece quando o placar grande sai da tela) ---------- */
+.minisb{display:none;align-items:center;gap:8px;margin-right:6px;padding:5px 10px;border:1px solid var(--line2);border-radius:10px;background:rgba(11,17,31,.85);color:var(--text);font:500 13px var(--sans);cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums}
+.minisb b{font-weight:650;font-size:14px;letter-spacing:-.02em}
+.minisb .msn{color:var(--muted)}
+.minisb .mbar{display:flex;width:64px;height:6px;border-radius:6px;overflow:hidden;background:var(--line)}
+.minisb .mbar i{display:block;height:100%}
+.minisb .mapu{color:var(--dim);font-size:12px;padding-left:8px;border-left:1px solid var(--line2)}
+.minisb:hover{border-color:var(--muted)}
+.top.sb .minisb{display:flex;animation:sbIn .2s var(--out)}
+@keyframes sbIn{from{opacity:0;transform:translateY(-3px)}}
+@media (max-width:1440px){.top.sb #turnoSeg,.top.sb .ref{display:none}}
+@media (max-width:1060px){.top.sb .minisb{margin-right:0}}
+@media (max-width:700px){.top.sb .live,.minisb .msn{display:none}.minisb{padding:4px 8px;gap:6px}.minisb .mbar{width:40px}}
+#tvBtn[aria-pressed="true"]{color:var(--accent);border-color:rgba(242,193,78,.4)}
+.x.lnk{margin-left:8px;padding:10px 14px;font-size:13.5px;border-radius:var(--r3)}
+
+/* ---------- telão: placar e mapa em tela cheia ---------- */
+body.tv .top .ctrls>:not(#tvBtn),body.tv .minisb,body.tv .foot{display:none!important}
+body.tv .wrap{max-width:none;padding:18px 32px 24px}
+body.tv #app>*:not(.board):not(.main):not(.wait2):not(.others){display:none!important}
+body.tv .main{grid-template-columns:1fr}
+body.tv .main>.card.right,body.tv .scopes,body.tv .detail,body.tv .board .share{display:none!important}
+body.tv .side .num{font-size:clamp(86px,9vw,150px)}
+body.tv .side .nm{font-size:clamp(26px,2.3vw,40px)}
+body.tv .pic{width:clamp(128px,10vw,190px);height:auto;aspect-ratio:128/156}
+body.tv .mid .apu b{font-size:clamp(48px,4.5vw,76px)}
+body.tv #mapBox{max-height:calc(100dvh - 300px)}
+body.tv .wait2 h2{font-size:clamp(56px,6vw,96px)}
+body.tv .cdn b{font-size:clamp(54px,6vw,104px)}
+
+/* celular: "1fr" não deixa a coluna encolher abaixo do conteúdo e a página ganhava rolagem lateral */
+@media (max-width:900px){.main,.lower{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.wrap{padding:14px 14px 56px}.ttbar{gap:8px}.ttbar input{min-width:0;flex:1 1 60px}}
+
+/* ---------- eleito definido ---------- */
+.side.won:after{height:4px;opacity:1}
+.side.won{background:radial-gradient(90% 130% at 50% 130%, color-mix(in oklab, var(--c) 24%, transparent), transparent 68%)}
+.side.lost .pic img{filter:grayscale(1);opacity:.6}
+.side.lost .num{color:color-mix(in oklab, var(--c) 45%, var(--dim))}
+.side.lost .nm{color:var(--muted)}
+/* ---------- ajuda de atalhos ---------- */
+.kgrid{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:16px 0 4px;font-size:14px}
+kbd{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:7px;background:var(--panel3);font:600 12.5px var(--sans);color:var(--text)}
 @media (max-width:900px){.wait2 h2{font-size:48px}.cdn b{font-size:40px}.maphead h2{font-size:32px}}
 @media (max-width:560px){.wait2 h2{font-size:40px}.cdn b{font-size:30px}.cdn .u{border-radius:12px}.wait2 .w-l:before{font-size:150px;bottom:-30px}.maphead h2{font-size:28px}.side .nm{font-size:19px}}
 @media (prefers-reduced-motion:reduce){#app.soft>*,.mapsvg.swap,.cdn b.flip,.live.ping i:after,.sug,#alertPanel,.mbox,.tip{animation:none}.check::details-content{transition:none}}
@@ -747,9 +791,11 @@ svg path.hov{transition:opacity .1s linear}
 <a class="skip" href="#app">Pular para o conteúdo</a>
 <header class="top"><div class="in">
   <div class="brand"><b>Apuração <em>2026</em></b><span class="live" id="live"><i></i>ao vivo</span><span class="t" id="turnoLbl">2º turno · 25 de outubro</span></div>
+  <button id="minisb" class="minisb" type="button"></button>
   <div class="ctrls">
   <div class="seg" id="turnoSeg"><button data-t="2" aria-pressed="true">2º turno</button><button data-t="1" aria-pressed="false">1º turno</button></div>
   <div class="seg" id="cargoSeg"><button data-c="pres" aria-pressed="true">Presidente</button><button data-c="gov" aria-pressed="false">Governador</button><button data-c="pol" aria-pressed="false">Quem foi eleito</button><button data-c="ana" aria-pressed="false">Análises</button></div>
+  <button class="cd" id="tvBtn" title="Telão: tela cheia com placar e mapa (T)" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="15" height="10" rx="1.5"/><path d="M7 17h6M10 13.5V17"/></svg><span>Telão</span></button>
   <button class="cd" id="bell" title="Alertas" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5.5 2 6H3c.5-.5 2-2 2-6z"/><path d="M8 16.5a2 2 0 0 0 4 0"/></svg><span>Alertas</span></button>
   <div class="ref">Atualiza a cada
     <select id="ivl" aria-label="Intervalo de atualização"><option value="30" selected>30 s</option><option value="60">1 min</option><option value="120">2 min</option></select>
@@ -1168,7 +1214,7 @@ function eventsFromSnaps(snaps,meta){
   const lead=x=>x&&Object.entries(x.v).sort((a,b)=>b[1]-a[1])[0]?.[0];
   let prev=null;
   for(const s of snaps){
-    if(!prev){ push(s.t,"info",`Primeiros resultados para presidente: ${pf(s.br.p)} apurado — ${duel(s.br)}.`); prev=s; continue; }
+    if(!prev){ push(s.t,"info",`Primeiros resultados para presidente: ${pf(s.br.p)} apurado: ${duel(s.br)}.`); prev=s; continue; }
     const b=s.br, a=prev.br;
     if(b.st>a.st) push(s.t,"tick",`TSE atualizou: +${nf(b.st-a.st)} seções apuradas (${pf(b.p)}). ${duel(b)}.`);
     const hit=MILES.filter(m=>a.p<m&&b.p>=m).pop(); if(hit!=null) push(s.t,"mile",`Apuração para presidente chega a <b>${hit===100?"100%":pf(b.p)}</b>: ${duel(b)}.`,"#F2C14E");
@@ -1178,7 +1224,7 @@ function eventsFromSnaps(snaps,meta){
       if((!y||y.p<100)&&x.p>=100) push(s.t,"state",`${UFNAME[u]} conclui a apuração para presidente: ${duel(x)}.`,pc[lead(x)]);
       else if(y&&lead(x)!==lead(y)&&x.p>=5) push(s.t,"lead",`Em ${UFNAME[u]}, ${nm(lead(x))} assume a liderança (${pf(x.p)} apurado).`,pc[lead(x)]); });
     Object.entries(s.g||{}).forEach(([u,x])=>{ const y=prev.g?.[u], c=gc(u);
-      if(!y){ push(s.t,"info",`Governo ${deUF(u)}: primeiros votos apurados — ${gduel(u,x)}.`); return; }
+      if(!y){ push(s.t,"info",`Governo ${deUF(u)}: primeiros votos apurados: ${gduel(u,x)}.`); return; }
       if(x.d&&x.d!==y.d) push(s.t,"win",`${gnm(u,x.d)} está eleito governador ${deUF(u)}.`,c[x.d]);
       if(y.p<100&&x.p>=100) push(s.t,"state",`Apuração para governador ${deUF(u)} concluída: ${gduel(u,x)}.`,c[lead(x)]);
       else if(lead(x)!==lead(y)&&x.p>=5) push(s.t,"lead",`Virada em ${UFNAME[u]}: ${gnm(u,lead(x))} passa à frente para governador.`,c[lead(x)]); });
@@ -1201,7 +1247,7 @@ function detectEvents(){
   const nm=(main,n)=>{ const c=main?.cands.find(x=>x.n===n); return c?`<b>${esc(shortName(c.nm))}</b>`:"?"; };
   const duel=main=>main.cands.slice(0,2).map(c=>`${esc(shortName(c.nm))} ${pf(c.pct)}`).join(" × ");
   const pc=colorMap(P.br?.cands||[]);
-  if(!prev){ if(P.br) pushFeed("info",`Painel conectado. Presidente: ${pf(P.br.pct)} apurado — ${duel(P.br)}.`);
+  if(!prev){ if(P.br) pushFeed("info",`Painel conectado. Presidente: ${pf(P.br.pct)} apurado: ${duel(P.br)}.`);
              T.snap=cur; store.set("ap26_snap_"+S.turno,cur); return; }
   if(P.br && prev.br){
     const b=P.br;
@@ -1212,12 +1258,12 @@ function detectEvents(){
     if(cur.br.dec && cur.br.dec!==prev.br.dec){ const d=decide(b);
       if(d.k==="win") pushFeed("win",`${nm(b,d.x.n)} está eleito presidente${d.src==="conta"?" (matematicamente)":""}.`,pc[d.x.n]);
       if(d.k==="t2") pushFeed("win",`Definido o 2º turno para presidente: ${nm(b,d.a.n)} × ${nm(b,d.b.n)}.`,"#F2C14E"); }
-  } else if(P.br && !prev.br){ pushFeed("info",`Primeiros resultados para presidente: ${pf(P.br.pct)} apurado — ${duel(P.br)}.`); }
+  } else if(P.br && !prev.br){ pushFeed("info",`Primeiros resultados para presidente: ${pf(P.br.pct)} apurado: ${duel(P.br)}.`); }
   [...UFS,"zz"].forEach(u=>{ const a=prev.ufs[u], c=cur.ufs[u], d=P.ufs[u]; if(!c||!d) return;
     if((!a||a.pct<100) && c.pct>=100) pushFeed("state",`${UFNAME[u]} conclui a apuração para presidente: ${duel(d)}.`,pc[c.lead]);
     else if(a && a.lead && c.lead!==a.lead && c.pct>=5) pushFeed("lead",`Em ${UFNAME[u]}, ${nm(d,c.lead)} assume a liderança (${pf(d.pct)} apurado).`,pc[c.lead]); });
   Object.entries(cur.gov).forEach(([u,c])=>{ const a=prev.gov?.[u], d=G.ufs[u], gc=colorMap(d.cands);
-    if(!a){ if(c.pct>0) pushFeed("info",`Governo ${deUF(u)}: primeiros votos apurados — ${duel(d)}.`); return; }
+    if(!a){ if(c.pct>0) pushFeed("info",`Governo ${deUF(u)}: primeiros votos apurados: ${duel(d)}.`); return; }
     if(c.dec && c.dec!==a.dec){ const x=decide(d); if(x?.k==="win") pushFeed("win",`${nm(d,x.x.n)} está eleito governador ${deUF(u)}${x.src==="conta"?" (matematicamente)":""}.`,gc[x.x.n]);
       if(x?.k==="t2") pushFeed("win",`${UFNAME[u]} terá 2º turno para governador: ${nm(d,x.a.n)} × ${nm(d,x.b.n)}.`,"#F2C14E"); }
     if(a.pct<100 && c.pct>=100) pushFeed("state",`Apuração para governador ${deUF(u)} concluída: ${duel(d)}.`,gc[c.lead]);
@@ -1313,7 +1359,7 @@ function cityCardHTML(){
 }
 function citySearchHTML(){
   return `<div class="citybar"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="6"/><path d="M14 14l4 4"/></svg>
-    <input id="cityQ" type="text" placeholder="Buscar cidade ou zona eleitoral — ex.: Campinas, Recife PE, zona 5 SP" autocomplete="off" spellcheck="false">
+    <input id="cityQ" type="text" placeholder="Buscar cidade ou zona eleitoral (ex.: Campinas, Recife PE, zona 5 SP)" autocomplete="off" spellcheck="false">
     <div id="citySug" class="sug"></div></div>${cityCardHTML()}`;
 }
 
@@ -1322,6 +1368,7 @@ const ALERT_TYPES=[["leadbr","Virada no Brasil"],["win","Eleito ou 2º turno def
 S.alerts=store.get("ap26_alerts",{on:false,sound:true,types:{leadbr:true,win:true,mile:true,lead:false,state:false}});
 function toast(text,col){
   let t=$("#toasts"); if(!t){ t=document.createElement("div"); t.id="toasts"; document.body.appendChild(t); }
+  if(!t.hasAttribute("role")){ t.setAttribute("role","status"); t.setAttribute("aria-live","polite"); }
   const el=document.createElement("div"); el.className="tst"; el.style.borderLeftColor=col||"var(--accent)"; el.textContent=text; t.prepend(el);
   setTimeout(()=>{ el.classList.add("out"); setTimeout(()=>el.remove(),400); },8000);
 }
@@ -1536,7 +1583,8 @@ function tagHTML(c){ const s=statusOf(c); return s?`<span class="chip ${s.k}">${
 function sideHTML(c,main,colors,est,uf,right){
   if(!c) return `<div class="side ${right?"r":""}"></div>`;
   const col=colors[c.n]||"#888", lead=main.val&&main.cands[0]===c;
-  return `<div class="side ${right?"r":""} ${lead?"lead":""}" style="--c:${col}">
+  const won=S.wonN!=null?(S.wonN===c.n?" won":" lost"):"";
+  return `<div class="side ${right?"r":""} ${lead?"lead":""}${won}" style="--c:${col}">
     <div class="pic">${foto(c,est,uf,col)}</div>
     <div><div class="nm">${esc(shortName(c.nm))}</div><div class="pt">${esc(c.party)} · ${esc(c.n)}${tagHTML(c)}</div>
     <div class="num">${tw("pc"+c.n,c.pct,"pn")}<i>%</i></div><div class="vt">${tw("vt"+c.n,c.votes,"n")} votos</div></div></div>`;
@@ -1551,6 +1599,8 @@ function boardHTML(main,colors,est,uf,label,decMain,decLabel){
   const top2=main.cands.slice(0,2).sort((a,b)=>(+a.n||0)-(+b.n||0)), [a,b]=top2;
   const lead=main.cands[0], sec=main.cands[1];
   const others=main.cands.slice(2);
+  /* eleito definido (TSE ou conta): o placar destaca quem ganhou e apaga quem perdeu */
+  const dd=decide(decMain||main); S.wonN=dd?.k==="win"&&top2.some(x=>x.n===dd.x.n)?dd.x.n:null;
   return `<section class="board">
     ${sideHTML(a,main,colors,est,uf,false)}
     <div class="mid"><div class="lbl">${esc(label)}</div>
@@ -1561,7 +1611,7 @@ function boardHTML(main,colors,est,uf,label,decMain,decLabel){
       <div class="share"><span class="k">Compartilhar imagem:</span><button class="x" data-share="post">Post</button><button class="x" data-share="story">Story</button></div>
     </div>
     ${sideHTML(b,main,colors,est,uf,true)}
-  </section>
+  </section>${(S.wonN=null,"")}
   ${others.length?`<div class="others">${others.map(c=>`<span><i style="background:${colors[c.n]}"></i>${esc(shortName(c.nm))}<b>${pf(c.pct)}</b></span>`).join("")}</div>`:""}`;
 }
 function smallCand(c,colors,est,uf){
@@ -1723,7 +1773,7 @@ function drawChart(key,colors,names){
   ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<28) ends[i].y=ends[i-1].y+28;
   ends.forEach(e=>{ g+=`<text x="${W-R+8}" y="${e.y}" font-size="12.5" font-weight="700" fill="${colors[e.n]}">${esc((names[e.n]||"").split(" ").slice(-1)[0])}</text><text x="${W-R+8}" y="${e.y+14}" font-size="12" fill="#E8ECF5">${pf(e.v)}</text>`; });
   g+=`<g id="chHover"></g><rect id="chHit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/>`;
-  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}">${g}</svg><div class="chtip" id="chTip"></div>${h.some(e=>e.seed)?`<div class="k" style="margin-top:6px">1º turno: ${h.length} parciais do TSE publicadas ao vivo pela imprensa na noite de 4/10 (cada bolinha é uma parcial). É tudo o que foi divulgado publicamente; o TSE não guarda o histórico minuto a minuto. No 2º turno, com a página aberta, entra um ponto a cada atualização — a curva fica bem mais densa.</div>`:""}`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}">${g}</svg><div class="chtip" id="chTip"></div>${h.some(e=>e.seed)?`<div class="k" style="margin-top:6px">1º turno: ${h.length} parciais do TSE publicadas ao vivo pela imprensa na noite de 4/10 (cada bolinha é uma parcial). É tudo o que foi divulgado publicamente; o TSE não guarda o histórico minuto a minuto. No 2º turno, com a página aberta, entra um ponto a cada atualização e a curva fica bem mais densa.</div>`:""}`;
   CH={h,ns,X,Y,L,R,T,B,W,H,colors,names,x0,x1};
 }
 function chartHover(ev){
@@ -1744,7 +1794,7 @@ function feedHTML(){
   const items=f.slice(0,400).map((e,i)=>`<div class="ev ${e.type} ${e.seed?"seed":""} ${i<S.newEv?"new":""}"><time>${hhmm(e.t)}</time><span class="d" style="${e.col?`background:${e.col}`:""}"></span><div>${e.html}</div></div>`).join("");
   return `<div class="card"><h3 style="display:flex;justify-content:space-between;align-items:center">Últimas atualizações
     <span class="modes"><button data-feed="all" aria-pressed="${S.feedF==="all"}">Tudo</button><button data-feed="top" aria-pressed="${S.feedF==="top"}">Destaques</button></span></h3>
-    ${S.turno===2?`<div class="k" style="margin:-4px 0 8px">${SRV.ok?`Histórico completo da noite, gravado a cada minuto pelo gravador central — igual para qualquer pessoa que abrir o site.`:SRV.url?"Gravador central fora do ar no momento: mostrando o que esta página registrou.":"Mostrando o que esta página registrou enquanto esteve aberta."}</div>`:""}
+    ${S.turno===2?`<div class="k" style="margin:-4px 0 8px">${SRV.ok?`Histórico completo da noite, gravado a cada minuto pelo gravador central, igual para qualquer pessoa que abrir o site.`:SRV.url?"Gravador central fora do ar no momento: mostrando o que esta página registrou.":"Mostrando o que esta página registrou enquanto esteve aberta."}</div>`:""}
     ${S.turno===1?`<div class="k" style="margin:-4px 0 8px">Noite de 4/10 reconstituída com boletins do TSE publicados pela imprensa; alguns horários são aproximados.</div>`:""}
     <div class="feed">${items||`<div class="k">As novidades da apuração aparecem aqui assim que o TSE publicar: seções apuradas, viradas, estados concluídos e eleitos.</div>`}</div></div>`;
 }
@@ -1782,7 +1832,7 @@ function waitHTML(){
       <div class="cdn" id="cdn">${cdnHTML()}</div>
       ${duel?`<div class="k" style="font-weight:500;font-size:13px;margin-top:4px">Presidente, resultado no 1º turno</div>${duel}`:""}
       <p class="k" style="max-width:56ch;margin:18px 0 0">O painel começa a puxar os dados do TSE sozinho. O gravador central registra a noite inteira, então gráfico, feed e "Voltar no tempo" ficam completos para quem abrir a qualquer hora.</p>
-      <div style="margin-top:auto;padding-top:20px"><button class="btn" data-turno="1">Ver o painel com o 1º turno</button></div></div>
+      <div style="margin-top:auto;padding-top:20px"><button class="btn" data-turno="1">Ver o painel com o 1º turno</button><button class="x lnk" data-ics>Lembrete na agenda</button></div></div>
     <div class="w-r"><div class="w-mh"><b>Como cada estado votou em 4 de outubro</b><span class="k">entre os dois finalistas</span></div><div id="mapBox" data-map="t1"></div><div class="legend">${leg}</div></div>
   </div>
   <h3 class="pre-h">Governador · ${races?races.length:"…"} disputas no 2º turno</h3><div class="pre-grid">${rows}</div>`;
@@ -1957,7 +2007,7 @@ function simUpdate(){
   S.sim=+r.value; $("#simV").textContent=pf(+r.value,1);
   const fT=m.vT+m.rem*x, fL=m.vL+m.rem*(1-x), t=fT+fL; const mm=remainingModel(); if(!mm) return;
   const nT=shortName(mm.T.nm), nL=shortName(mm.L.nm), win=fT>fL?nT:nL;
-  $("#simOut").innerHTML=`Resultado: ${esc(nL)} <b style="color:var(--text)">${pf(fL/t*100)}</b> × ${esc(nT)} <b style="color:var(--text)">${pf(fT/t*100)}</b> — <b style="color:var(--text)">${esc(win)} vence</b> por ${mi(Math.abs(fT-fL))} votos.`;
+  $("#simOut").innerHTML=`Resultado: ${esc(nL)} <b style="color:var(--text)">${pf(fL/t*100)}</b> × ${esc(nT)} <b style="color:var(--text)">${pf(fT/t*100)}</b>, <b style="color:var(--text)">${esc(win)} vence</b> por ${mi(Math.abs(fT-fL))} votos.`;
 }
 /* 2) Para onde foram os votos do 1º turno: compara cada estado no 2º turno com o 1º turno */
 const T1S={data:null,loading:false};
@@ -2291,7 +2341,7 @@ function render(){
   if((nav||late)&&!RM){ app.classList.remove("enter","soft"); void app.offsetWidth; app.classList.add(bigNav?"enter":"soft"); }
   drawMap(); drawChartNow(); drawPolMap(); simRun(); ttRun(); syncSide();
   animateNumbers(app); animateBars(app,sig); if(S.data[S.turno]?.pres?.br) S.booted=true;
-  $("#bell")?.setAttribute("aria-pressed",String(S.alerts.on)); };
+  $("#bell")?.setAttribute("aria-pressed",String(S.alerts.on)); postRender(); };
   segInd();
   if(nav && bigNav && S.shown && !RM && document.startViewTransition){ S.vtPending=true; document.startViewTransition(apply); } else apply();
   if(!app.querySelector(".boot")) S.shown=true;
@@ -2484,6 +2534,100 @@ setInterval(()=>{
 let rz,lastW=window.innerWidth;
 window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(window.innerWidth!==lastW){ lastW=window.innerWidth; drawMap(); drawChartNow(); drawPolMap(); simRun(); syncSide(); } segInd(); },200); });
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && Date.now()>S.next) refresh(); });
+
+/* ============ NOITE DE APURAÇÃO: aba, ícone, placar fixo, telão, atalhos ============ */
+const lastName = n => { const w=shortName(n).split(" ").filter(x=>x.length>2); return w[w.length-1]||shortName(n); };
+const pct1 = v => v==null||isNaN(v) ? "—" : v.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+const apu1 = v => v>=99.995 ? "100" : pct1(v);
+/* os dois primeiros na ordem do número (igual ao placar), com a cor de cada um */
+function duo(){
+  const br=D().pres.br; if(!br||!br.val||br.cands.length<2) return null;
+  const col=colorMap(br.cands), [a,b]=br.cands.slice(0,2).sort((x,y)=>(+x.n||0)-(+y.n||0));
+  return {a,b,ca:col[a.n],cb:col[b.n],pct:br.pct};
+}
+/* título da aba: dá para acompanhar a apuração sem trocar de aba */
+function updateTitle(){
+  const d=duo(); let t;
+  if(d) t=`${lastName(d.a.nm)} ${pct1(d.a.pct)} × ${pct1(d.b.pct)} ${lastName(d.b.nm)} · ${apu1(d.pct)}% apurado`;
+  else if(S.turno===2 && ELEC_DAY2-Date.now()>0){ const p=cdnParts(); t=`Faltam ${p.d}d ${p.h}h ${String(p.m).padStart(2,"0")}min · Apuração 2026`; }
+  else t=`Apuração 2026 · ${S.turno}º turno`;
+  if(document.title!==t) document.title=t;
+  updateFavicon(d);
+}
+/* ícone da aba: anel dourado = % apurado; dentro, a fatia de cada candidato */
+let FAVK="";
+function updateFavicon(d){
+  const k=d?[d.ca,d.cb,d.a.pct.toFixed(1),d.b.pct.toFixed(1),d.pct.toFixed(0)].join("|"):"idle"; if(k===FAVK) return; FAVK=k;
+  if(!d) return;
+  const c=document.createElement("canvas"); c.width=c.height=64; const g=c.getContext("2d");
+  g.fillStyle="#05080F"; g.beginPath(); if(g.roundRect) g.roundRect(0,0,64,64,14); else g.rect(0,0,64,64); g.fill();
+  g.lineWidth=6; g.strokeStyle="#1A2540"; g.beginPath(); g.arc(32,32,24,0,Math.PI*2); g.stroke();
+  g.strokeStyle="#F2C14E"; g.beginPath(); g.arc(32,32,24,-Math.PI/2,-Math.PI/2+Math.PI*2*clamp(d.pct/100,0,1)); g.stroke();
+  const t=(d.a.pct+d.b.pct)||1, wa=32*d.a.pct/t; g.save(); g.beginPath(); g.arc(32,32,16,0,Math.PI*2); g.clip();
+  g.fillStyle=d.ca; g.fillRect(16,16,wa,32); g.fillStyle=d.cb; g.fillRect(16+wa,16,32-wa,32); g.restore();
+  const l=document.querySelector('link[rel="icon"]'); if(l) l.href=c.toDataURL("image/png");
+}
+/* placar fixo no topo: aparece quando o placar grande sai da tela, para ver o resultado enquanto rola o mapa e a tabela */
+let SBIO=null;
+function updateMiniBoard(){
+  const top=$(".top"), mb=$("#minisb"), board=$("#app .board");
+  if(SBIO){ SBIO.disconnect(); SBIO=null; }
+  const sides=board?[...board.querySelectorAll(".side")].filter(s=>s.querySelector(".nm")):[];
+  if(!mb||sides.length<2){ top.classList.remove("sb"); return; }
+  const it=s=>({nm:s.querySelector(".nm").textContent, pc:+(s.querySelector(".num .tw")?.dataset.v)||0, c:s.style.getPropertyValue("--c")});
+  const [A,B]=sides.map(it), apu=+(board.querySelector(".mid .apu .tw")?.dataset.v)||0, two=A.pc+B.pc>=99.5, tt=(A.pc+B.pc)||1;
+  const wa=two?A.pc/tt*100:A.pc, wb=two?100-wa:B.pc;
+  mb.innerHTML=`<span class="msn">${esc(lastName(A.nm))}</span><b style="color:${A.c}">${pct1(A.pc)}</b><span class="mbar"><i style="width:${wa}%;background:${A.c}"></i><i style="flex:1"></i><i style="width:${wb}%;background:${B.c}"></i></span><b style="color:${B.c}">${pct1(B.pc)}</b><span class="msn">${esc(lastName(B.nm))}</span><span class="mapu">${apu1(apu)}%</span>`;
+  mb.setAttribute("aria-label",`${A.nm} ${pct1(A.pc)}%, ${B.nm} ${pct1(B.pc)}%, ${apu1(apu)}% apurado. Voltar ao placar`);
+  SBIO=new IntersectionObserver(([e])=>top.classList.toggle("sb",!e.isIntersecting&&e.boundingClientRect.top<0),{rootMargin:`-${top.offsetHeight}px 0px 0px 0px`});
+  SBIO.observe(board);
+}
+function postRender(){ updateTitle(); updateMiniBoard(); }
+setInterval(updateTitle,15000);
+
+/* telão: tela cheia só com placar e mapa, e a tela do celular ou da TV fica acesa */
+let WAKE=null;
+async function wake(on){ try{ if(on&&"wakeLock" in navigator&&!WAKE){ WAKE=await navigator.wakeLock.request("screen"); WAKE.addEventListener("release",()=>{ WAKE=null; }); } if(!on&&WAKE){ await WAKE.release(); WAKE=null; } }catch(e){} }
+function tv(on){
+  on=on??!document.body.classList.contains("tv");
+  document.body.classList.toggle("tv",on); $("#tvBtn")?.setAttribute("aria-pressed",String(on));
+  if(on){ document.documentElement.requestFullscreen?.().catch(()=>{}); window.scrollTo(0,0); }
+  else if(document.fullscreenElement) document.exitFullscreen?.().catch(()=>{});
+  wake(on); setTimeout(()=>{ drawMap(); syncSide(); updateMiniBoard(); },80);
+}
+document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement && document.body.classList.contains("tv")) tv(false); });
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && document.body.classList.contains("tv")) wake(true); });
+
+/* lembrete do 2º turno: arquivo .ics que abre na agenda do celular ou do computador */
+function icsDownload(){
+  const url=/^https?:/.test(location.protocol)?" "+location.href.split("#")[0]:"";
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Apuracao 2026//PT-BR","BEGIN:VEVENT","UID:apuracao-2026-turno2","DTSTAMP:20261010T000000Z",
+    "DTSTART:20261025T200000Z","DTEND:20261026T020000Z","SUMMARY:Apuração do 2º turno","DESCRIPTION:A apuração começa às 17h (Brasília)."+url,
+    "BEGIN:VALARM","TRIGGER:-PT15M","ACTION:DISPLAY","DESCRIPTION:A apuração começa em 15 minutos","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([ics],{type:"text/calendar"})); a.download="apuracao-2-turno.ics"; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+}
+
+/* atalhos de teclado */
+const KEYS=[["1","1º turno"],["2","2º turno"],["P","Presidente"],["G","Governador"],["E","Quem foi eleito"],["A","Análises"],["/","Buscar cidade"],["T","Telão"],["R","Atualizar agora"],["Esc","Fechar"],["?","Esta ajuda"]];
+function keyHelp(on){
+  let m=$("#kbd"); if(on===false||(on==null&&m)){ m?.remove(); return; } if(m) return;
+  m=document.createElement("div"); m.className="modal"; m.id="kbd";
+  m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true" aria-label="Atalhos de teclado"><div class="mt">Atalhos de teclado</div><div class="kgrid">${KEYS.map(([k,t])=>`<kbd>${k}</kbd><span>${t}</span>`).join("")}</div><div class="mbtn"><button class="x" data-kclose>Fechar</button></div></div>`;
+  m.addEventListener("click",e=>{ if(e.target===m||e.target.closest("[data-kclose]")) keyHelp(false); });
+  document.body.appendChild(m); m.querySelector("[data-kclose]").focus();
+}
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest?.("input,select,textarea,[contenteditable]")) return;
+  const k=e.key, kk=k.toLowerCase();
+  if(k==="Escape"){ if($("#kbd")) return keyHelp(false); if(document.body.classList.contains("tv")) return tv(false); if(S.detail){ S.detail=null; render(); } return; }
+  if(k==="?"){ e.preventDefault(); return keyHelp(); }
+  if(k==="/"){ const q=$("#cityQ"); if(q){ e.preventDefault(); q.focus(); } return; }
+  const map={"1":'#turnoSeg [data-t="1"]',"2":'#turnoSeg [data-t="2"]',p:'#cargoSeg [data-c="pres"]',g:'#cargoSeg [data-c="gov"]',e:'#cargoSeg [data-c="pol"]',a:'#cargoSeg [data-c="ana"]'};
+  if(map[kk]){ document.querySelector(map[kk])?.click(); return; }
+  if(kk==="t") return tv();
+  if(kk==="r") return refresh();
+});
+document.addEventListener("click",e=>{ if(e.target.closest?.("#tvBtn")) tv(); if(e.target.closest?.("[data-ics]")) icsDownload(); if(e.target.closest?.("#minisb")) window.scrollTo({top:0,behavior:"smooth"}); });
 
 (async()=>{ await discover(); if(SRV.url&&S.turno===2) await fetchServer(true); refresh(); discoverDivulga(); })();
 </script>
