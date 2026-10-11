@@ -758,7 +758,8 @@ svg path.hov{transition:opacity .1s linear}
 /* ---------- telão: placar e mapa em tela cheia ---------- */
 body.tv .top .ctrls>:not(#tvBtn),body.tv .minisb,body.tv .foot{display:none!important}
 body.tv .wrap{max-width:none;padding:18px 32px 24px}
-body.tv #app>*:not(.board):not(.main):not(.wait2):not(.others){display:none!important}
+body.tv #app>*:not(.board):not(.main):not(.wait2):not(.others):not(.math){display:none!important}
+body.tv .math .mhow{display:none}
 body.tv .main{grid-template-columns:1fr}
 body.tv .main>.card.right,body.tv .scopes,body.tv .detail,body.tv .board .share{display:none!important}
 body.tv .side .num{font-size:clamp(86px,9vw,150px)}
@@ -779,6 +780,43 @@ body.tv .cdn b{font-size:clamp(54px,6vw,104px)}
 .side.lost .pic img{filter:grayscale(1);opacity:.6}
 .side.lost .num{color:color-mix(in oklab, var(--c) 45%, var(--dim))}
 .side.lost .nm{color:var(--muted)}
+
+/* ---------- a matemática da noite ---------- */
+.math{margin-bottom:16px;padding:22px 24px 18px}
+.math h3{margin-bottom:22px}
+.mstrip{position:relative;padding:18px 0 4px}
+.mtrack{display:flex;height:18px;border-radius:9px;overflow:hidden;background:var(--line);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.mtrack i{display:block;height:100%;transition:width .7s var(--out)}
+.mtrack i+i{box-shadow:inset 1px 0 0 rgba(5,8,15,.6)}
+.mexp,.mlegend i.mexp{background:repeating-linear-gradient(135deg,rgba(236,239,246,.22) 0 4px,rgba(236,239,246,.07) 4px 8px)}
+.mmax,.mlegend i.mmax{background:rgba(236,239,246,.05)}
+.moth,.mlegend i.moth{background:#3A4664}
+.mhalf{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--text);border-radius:2px;pointer-events:none}
+.mhalf b{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-4px);white-space:nowrap;font:600 11.5px var(--sans);color:var(--text);background:var(--panel);padding:0 6px}
+.mlegend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 18px;font-size:12.5px;color:var(--muted)}
+.mlegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.mtiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mtile{position:relative;padding:16px 18px;border-radius:var(--r2);background:var(--panel2);box-shadow:inset 0 2px 0 var(--c),inset 0 0 0 1px var(--line)}
+.mtile .mbig{display:flex;align-items:baseline;gap:8px;margin:4px 0 6px;font:650 clamp(30px,3.4vw,44px)/1 var(--sans);letter-spacing:-.045em;color:var(--c)}
+.mtile .mbig small{font:500 14px var(--sans);letter-spacing:0;color:var(--muted)}
+.mtile p{margin:0;font-size:13.5px;color:var(--muted);max-width:52ch}
+.mtile.won{background:color-mix(in oklab,var(--c) 12%,var(--panel2))}
+.mtile.out .mbig{color:var(--dim);font-size:24px}
+.mstats{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:0;margin-top:14px;border-top:1px solid var(--line)}
+.mstat{padding:14px 16px 4px 0;display:flex;flex-direction:column;gap:4px}
+.mstat+.mstat{padding-left:16px;border-left:1px solid var(--line)}
+.mstat b{font:650 20px/1.2 var(--sans);letter-spacing:-.03em}
+.mstat p{margin:0;font-size:13.5px;color:var(--muted)}
+.mstat p b{font-size:15px}
+.mprob{display:flex;height:6px;border-radius:6px;overflow:hidden;margin:4px 0 2px;background:var(--line)}
+.mprob i{display:block;height:100%;transition:width .7s var(--out)}
+.mhow{margin-top:14px;font-size:13px;color:var(--muted)}
+.mhow summary{cursor:pointer;color:var(--dim);list-style:none}
+.mhow summary::-webkit-details-marker{display:none}
+.mhow summary:hover{color:var(--text)}
+.mhow p{max-width:80ch;margin:8px 0 0}
+@media (max-width:900px){.mtiles{grid-template-columns:1fr}.mstats{grid-template-columns:1fr}.mstat+.mstat{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+@media (max-width:560px){.math{padding:18px 16px 14px}.mlegend{gap:4px 12px;font-size:12px}}
 /* ---------- ajuda de atalhos ---------- */
 .kgrid{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:16px 0 4px;font-size:14px}
 kbd{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:7px;background:var(--panel3);font:600 12.5px var(--sans);color:var(--text)}
@@ -1806,6 +1844,86 @@ function tableHTML(rows,cols){
   return `<div class="scroll"><table class="tbl"><thead><tr>${cols.map(c=>`<th data-sort="${c.k}" class="${k===c.k?"on":""}">${c.t}${k===c.k?(d>0?" ↑":" ↓"):""}</th>`).join("")}</tr></thead><tbody>${sorted.map(r=>r.html).join("")}</tbody></table></div>`;
 }
 
+/* ============ A MATEMÁTICA DA NOITE ============
+   Duas contas diferentes, sempre separadas na tela:
+   1) CONTA (certeza): "número mágico". O teto do que ainda pode entrar é todo eleitor das seções que faltam
+      votando válido (mesma margem de 2% usada no aviso de eleito). Quem passar da metade de (válidos + teto) está
+      eleito, aconteça o que acontecer.
+   2) ESTATÍSTICA (estimativa): 3.000 simulações. Em cada uma, o que falta em cada estado repete o padrão do
+      próprio estado com um erro aleatório (maior onde pouco foi apurado) mais um erro nacional comum a todos.
+      Daí saem a chance de vitória e a faixa provável do resultado final. Não é pesquisa: só extrapola o que já
+      foi apurado. */
+function rng(seed){ let s=(seed>>>0)||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+function gauss(r){ let u=0; while(!u) u=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r()); }
+const MCM={};
+function mathModel(main,units,turno){
+  if(!main||!main.val||main.cands.length<2) return null;
+  const [L,B]=main.cands, two=turno===2||main.cands.length===2;
+  const R=Math.max(0,(main.ele||0)*(1-(main.pct||0)/100))*1.02;
+  const half=(main.val+R)/2, magic=c=>Math.floor(half-c.votes)+1;
+  const us=(units&&units.length?units:[main]).filter(d=>d&&d.cands).map(d=>{
+    const f=(d.pct||0)/100, exp=f>=0.005?d.val/f:(d.ele?d.ele*0.79*0.93:0), r=Math.max(0,exp-d.val);
+    const sh=c=>d.val?(d.cands.find(x=>x.n===c.n)?.votes||0)/d.val:c.pct/100;
+    return {r,f,sL:sh(L),sB:sh(B),known:f>=0.005}; });
+  const Rexp=us.reduce((a,u)=>a+u.r,0);
+  const key=[main.val,main.pct,Math.round(Rexp),turno,L.n,B.n].join("|");
+  let mc=MCM[key];
+  if(!mc){
+    const r=rng(main.val%2147483647+Math.round((main.pct||0)*1000)), N=3000, fN=(main.pct||0)/100, fin=new Float64Array(N); let wL=0, oL=0;
+    for(let i=0;i<N;i++){
+      const eN=gauss(r)*0.03*Math.sqrt(Math.max(0,1-fN)); let vL=L.votes, vB=B.votes, tot=main.val;
+      for(const u of us){ if(u.r<1) continue;
+        const e=eN+gauss(r)*(u.known?0.05*Math.sqrt(1-u.f):0.08);
+        const a=clamp(u.sL+e,0,1), b=two?1-a:clamp(u.sB-e*0.6,0,1-a);
+        vL+=u.r*a; vB+=u.r*b; tot+=u.r; }
+      fin[i]=vL/tot; if(vL>vB) wL++; if(vL/tot>0.5) oL++; }
+    fin.sort();
+    mc=MCM[key]={pWin:wL/N,pOver:oL/N,lo:fin[Math.floor(N*.05)],mid:fin[Math.floor(N*.5)],hi:fin[Math.floor(N*.95)]};
+  }
+  const doingB=Rexp>0?us.reduce((a,u)=>a+u.r*u.sB,0)/Rexp:null;
+  const needB=Rexp>0?(L.votes-B.votes+Rexp)/(2*Rexp):null;
+  return {L,B,two,R,half,mL:magic(L),mB:magic(B),Rexp,mc,needB,doingB,val:main.val,pct:main.pct||0};
+}
+const chance = p => p>=0.995?"mais de 99%":p<=0.005?"menos de 1%":Math.round(p*100)+"%";
+function mathHTML(main,units,colors,turno,cargo){
+  const m=mathModel(main,units,turno); if(!m) return "";
+  const nm=c=>esc(shortName(c.nm)), cL=colors[m.L.n]||"#888", cB=colors[m.B.n]||"#888";
+  const done=m.pct>=99.99;
+  const tot=m.val+(done?0:m.R), w=v=>(v/tot*100).toFixed(3)+"%";
+  const oth=Math.max(0,m.val-m.L.votes-m.B.votes);
+  const strip=`<div class="mstrip" role="img" aria-label="Votos de ${nm(m.L)} e ${nm(m.B)} em relação à metade de todos os votos possíveis">
+      <div class="mtrack"><i style="width:${w(m.L.votes)};background:${cL}"></i>${done?"":`<i class="mexp" style="width:${w(Math.min(m.Rexp,m.R))}"></i><i class="mmax" style="flex:1"></i>`}${oth?`<i class="moth" style="width:${w(oth)}"></i>`:""}<i style="width:${w(m.B.votes)};background:${cB}"></i></div>
+      <span class="mhalf"><b>metade + 1</b></span></div>
+    <div class="mlegend"><span><i style="background:${cL}"></i>${nm(m.L)} ${nf(m.L.votes)}</span>${done?"":`<span><i class="mexp"></i>ainda devem entrar ~${mi(m.Rexp)}</span><span><i class="mmax"></i>teto possível ${mi(m.R)}</span>`}${oth?`<span><i class="moth"></i>outros ${mi(oth)}</span>`:""}<span><i style="background:${cB}"></i>${nm(m.B)} ${nf(m.B.votes)}</span></div>`;
+  if(done){
+    const t2=m.L.votes+m.B.votes;
+    return `<section class="card math"><h3>A matemática da noite <small>apuração concluída</small></h3>${strip}
+      <p class="mlead">${nm(m.L)} terminou com <b style="color:${cL}">${nf(m.L.votes-m.B.votes)}</b> votos a mais que ${nm(m.B)}${m.two?`, ${pf(m.L.votes/t2*100)} a ${pf(m.B.votes/t2*100)} dos votos dos dois`:""}.</p></section>`;
+  }
+  const goal=m.two?"está eleito":(turno===1&&cargo!=="sen"?"vence já no 1º turno":"passa da metade");
+  const tile=(c,mg,col)=>{
+    if(mg<=0) return `<div class="mtile won" style="--c:${col}"><span class="k">${nm(c)}</span><b class="mbig">Já passou</b><p>Tem mais da metade de todos os votos que ainda podem existir. ${m.two?"Eleito pela conta.":"Vence sem 2º turno pela conta."}</p></div>`;
+    if(mg>m.R) return `<div class="mtile out" style="--c:${col}"><span class="k">${nm(c)}</span><b class="mbig">Sem chance de maioria</b><p>Nem com todos os votos que ainda podem entrar chega à metade.</p></div>`;
+    return `<div class="mtile" style="--c:${col}"><span class="k">${nm(c)} precisa de mais</span><b class="mbig">${tw("mg"+c.n,mg,"n")}<small>votos</small></b><p>Se tiver mais ${nf(mg)} votos, ${goal}, aconteça o que acontecer com o resto. É ${pf(mg/m.R*100,1)} do máximo que ainda pode entrar.</p></div>`;
+  };
+  const pW=m.two?m.mc.pWin:m.mc.pOver;
+  const viraTxt = m.needB==null?"" : m.needB>1 ? `<b>Pela estimativa, não dá mais.</b> ${nm(m.B)} precisaria de mais de 100% do que falta.`
+    : `${nm(m.B)} precisa de <b style="color:${cB}">${pf(m.needB*100,1)}</b> dos votos que faltam para passar ${nm(m.L)}. Nos lugares onde ainda há voto, vem fazendo <b style="color:${cB}">${pf(m.doingB*100,1)}</b>.`;
+  return `<section class="card math"><h3>A matemática da noite <small>conta exata e estimativa, refeitas a cada atualização</small></h3>
+    ${strip}
+    <div class="mtiles">${tile(m.L,m.mL,cL)}${tile(m.B,m.mB,cB)}</div>
+    <div class="mstats">
+      <div class="mstat"><span class="k">${m.two?"Chance de vitória":"Chance de vencer no 1º turno"}</span><b>${nm(m.L)} <span style="color:${cL}">${chance(pW)}</span></b>
+        ${m.two?`<div class="mprob"><i style="width:${(pW*100).toFixed(1)}%;background:${cL}"></i><i style="flex:1;background:${cB}"></i></div><span class="k">${nm(m.B)} ${chance(1-pW)}</span>`:`<span class="k">Senão, vai ao 2º turno.</span>`}</div>
+      <div class="mstat"><span class="k">Resultado final projetado</span><b>${nm(m.L)} <span style="color:${cL}">${pf(m.mc.mid*100,1)}</span></b><span class="k">entre ${pf(m.mc.lo*100,1)} e ${pf(m.mc.hi*100,1)} em 9 de cada 10 simulações</span></div>
+      <div class="mstat"><span class="k">Para virar</span><p>${viraTxt}</p></div>
+    </div>
+    <details class="mhow"><summary>Como essas contas são feitas</summary>
+      <p><b>Número mágico (conta exata).</b> Soma os votos válidos já apurados com o teto do que ainda pode entrar: todo eleitor das seções que faltam votando em alguém (mais 2% de folga). Quem tiver mais da metade disso está eleito, mesmo que todo o resto vá para o adversário.</p>
+      <p><b>Chance e projeção (estimativa).</b> 3.000 simulações. Em cada uma, os votos que faltam em cada estado seguem o padrão do próprio estado, com uma variação aleatória maior onde pouco foi apurado, e uma variação nacional comum a todos. Não é pesquisa: só projeta o que o TSE já publicou.</p></details>
+  </section>`;
+}
+
 /* ============ RENDER: PÁGINAS ============ */
 const PRE={pres:null,loading:false};
 function loadPre(){ if(PRE.pres||PRE.loading) return; PRE.loading=true;
@@ -1905,6 +2023,7 @@ function presPage(){
   return `${miss}
   ${citySearchHTML()}
   ${boardHTML(view,colors,false,"br",sc==="BR"?(S.src==="soma"?"Presidente · Brasil · soma dos estados (conta desta página)":"Presidente · Brasil · total do TSE"):"Presidente · "+title,br,"presidente")}
+  ${sc==="BR"?mathHTML(view,[...UFS,"zz"].map(u=>P.ufs[u]),colors,S.turno,"pres"):""}
   <div class="main">
     <div class="card center">
       <div class="scopes">${scopes}</div>
@@ -1946,6 +2065,7 @@ function govPage(){
       html:`<tr class="click" data-gsel="${r}"><td>${UFNAME[r]}</td><td>${pf(m.pct)}</td><td><span class="dot" style="background:${c[a?.n]}"></span>${esc(shortName(a?.nm||""))}${a?tagHTML(a):""}</td><td>${pf(a?.pct)}</td><td>${esc(shortName(b?.nm||""))}</td><td>${pf(b?.pct)}</td><td>${pp((a?.pct||0)-(b?.pct||0))}</td><td>${pf(m.pabst)}</td></tr>`}; });
   return `${S.turno===2?(preRef?`<div class="note">O 2º turno para governador ${PREP[u]} <b>${UFNAME[u]}</b> é em 25/10. Até lá, o placar mostra o resultado de cada finalista no 1º turno.</div>`:""):`<div class="note">No 1º turno, todos os 27 estados aparecem aqui. No 2º turno, só os que tiverem disputa.</div>`}
   ${boardHTML(d,colors,true,u,"Governador · "+UFNAME[u],d,"governador "+deUF(u))}
+  ${mathHTML(d,null,colors,S.turno,"gov")}
   <div class="main">
     <div class="card center">
       <div class="maphead"><h2>Mapa · governadores</h2><div class="modes">${[["win","Quem lidera"],["apu","Apuração"]].map(([k,t])=>`<button data-mode="${k}" aria-pressed="${(S.mode==="apu"?"apu":"win")===k}">${t}</button>`).join("")}</div></div>
