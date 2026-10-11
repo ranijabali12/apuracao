@@ -1805,7 +1805,7 @@ function fillFor(main,colors,mode,A,B){
 /* cada estado é um grupo: fundo apagado + "nível" que enche de baixo para cima até o % apurado */
 /* cada mapa ganha um prefixo próprio nos recortes: com dois mapas na página (principal e "Voltar no tempo"),
    ids iguais faziam um mapa usar o recorte do outro e o nível aparecia em pedaços fora do lugar */
-let MAPN=0;
+let MAPN=0; const HOVP=`<path class="hov" d="" fill="none"/>`;
 function brMapSVG(W,H,fillOf,focus,sel,labelOf,defs,levelOf){
   const cpx="cp"+(++MAPN)+"_";
   const anim = sel && sel!==S.mapSel; S.mapSel=sel||null;
@@ -1823,14 +1823,21 @@ function brMapSVG(W,H,fillOf,focus,sel,labelOf,defs,levelOf){
     const proj=d3.geoMercator().fitExtent([[12,12],[W-12,H-12]],{type:"FeatureCollection",features:fit.map(x=>x.f)});
     const path=d3.geoPath(proj);
     const order=[...GEO.br.filter(x=>x.uf!==sel), ...GEO.br.filter(x=>x.uf===sel)];
-    g=order.map(x=>one(x.uf,path(x.f),path.bounds(x.f),path.centroid(x.f)[0]||0)).join("");
-    g+=order.filter(x=>!focus||focus.includes(x.uf)).map(x=>{ const [cx,cy]=path.centroid(x.f); const a=path.area(x.f); const fs=clamp(Math.sqrt(a)/5.2,6.5,11.5); if(!isFinite(cx)||a<(focus?60:140)||fs*2.1>Math.sqrt(a)*1.25) return ""; return `<text class="${sel&&sel!==x.uf?"bg":""}" x="${cx.toFixed(1)}" y="${(x.uf===sel?cy-3:cy).toFixed(1)}" text-anchor="middle" dy="${(fs*0.35).toFixed(1)}" style="font-size:${fs.toFixed(1)}px">${labelOf(x.uf)}</text>`; }).join("");
+    /* ordem de desenho: estados, nomes, contorno de hover e, por cima de tudo, o estado selecionado com o seu nome.
+       Assim nenhuma divisa, nome ou contorno de hover de vizinho passa por cima do estado levantado */
+    const shape=x=>one(x.uf,path(x.f),path.bounds(x.f),path.centroid(x.f)[0]||0);
+    const label=x=>{ const [cx,cy]=path.centroid(x.f); const a=path.area(x.f); const fs=clamp(Math.sqrt(a)/5.2,6.5,11.5); if(!isFinite(cx)||a<(focus?60:140)||fs*2.1>Math.sqrt(a)*1.25) return ""; return `<text class="${sel&&sel!==x.uf?"bg":""}" x="${cx.toFixed(1)}" y="${(x.uf===sel?cy-3:cy).toFixed(1)}" text-anchor="middle" dy="${(fs*0.35).toFixed(1)}" style="font-size:${fs.toFixed(1)}px">${labelOf(x.uf)}</text>`; };
+    const rest=order.filter(x=>x.uf!==sel), top=order.filter(x=>x.uf===sel), shown=x=>!focus||focus.includes(x.uf);
+    /* Goiás tem um buraco onde fica o DF: levantado, o buraco ficaria vazio. O DF vai junto, dentro do grupo de GO */
+    let topS=top.map(shape).join(""); const df=sel==="go"&&GEO.br.find(x=>x.uf==="df");
+    if(df){ const f=fillOf("df"); topS=topS.replace(/<\/g>$/,`<path class="st" d="${path(df.f)}" fill="${f}" pointer-events="none"/></g>`); }
+    g=rest.map(shape).join("")+rest.filter(shown).map(label).join("")+HOVP+topS+top.filter(shown).map(label).join("");
   } else {
     const cols=7, rows=8, s=Math.min((W-20)/cols,(H-20)/rows), ox=(W-s*cols)/2, oy=(H-s*rows)/2;
     g=[...UFS.filter(u=>u!==sel),...UFS.filter(u=>u===sel)].map(uf=>{ const [c,r]=TILE[uf]; const x=ox+c*s, y=oy+r*s, w=s-4;
       const d=`M${x+2},${y+2}h${w}v${w}h${-w}z`; return one(uf,d,[[x+2,y+2],[x+2+w,y+2+w]],x+s/2)+`<text x="${x+s/2}" y="${y+s/2+4}" text-anchor="middle" style="font-size:${Math.max(10,s/4)}px">${uf.toUpperCase()}</text>`; }).join("");
   }
-  return `<svg class="mapsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa do Brasil por estado"><defs>${defs||""}${clip}</defs>${g}<path class="hov" d="" fill="none"/></svg>`;
+  return `<svg class="mapsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa do Brasil por estado"><defs>${defs||""}${clip}</defs>${g}${g.includes(HOVP)?"":HOVP}</svg>`;
 }
 /* anima o nível de cada estado do valor anterior até o novo; na primeira vez, em onda de oeste para leste */
 const LVM={};
