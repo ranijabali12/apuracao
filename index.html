@@ -895,6 +895,7 @@ body.tv #crawl{display:none}
 .tt-est{margin-top:8px;font-size:12px;color:var(--dim)}
 @media (max-width:560px){#crawl{height:34px;font-size:12.5px}.cr-tag{padding:0 10px;font-size:10.5px}}
 @media (prefers-reduced-motion:reduce){.cr-track{animation:none}.cr-box,.tvb-news{overflow-x:auto}}
+#ttMap .mapsvg .stg path.st{transition:fill .35s linear}
 /* ---------- manchete automática ---------- */
 .headline{margin:4px 0 16px;max-width:70ch;font:500 clamp(17px,1.6vw,21px)/1.45 var(--sans);letter-spacing:-.015em;color:var(--muted);text-wrap:pretty}
 .headline b{color:var(--text);font-weight:650}
@@ -1547,20 +1548,17 @@ function ttRun(){
   S.ttSt=st; $("#ttInfo").innerHTML=`<div class="k">Boletim das <b style="color:var(--text)">${hhmm(e.t)}</b> · ${pf(e.p)} apurado</div>
     ${ns.map(n=>`<div class="ttc" style="--c:${colors[n]||"#888"}"><span>${esc(names[n]||n)}</span><b>${pf(e.v[n])}</b></div>`).join("")}
     ${tugHTML(e.v[ns[0]],e.v[ns[1]],colors[ns[0]],colors[ns[1]],"margin:8px 0 12px")}
-    ${hasStates||est?`<div class="k">Estados liderados naquele momento: ${Object.entries(lead).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<b style="color:${colors[n]}">${esc(names[n]||n)} ${c}</b>`).join(" · ")}</div>${est?`<div class="k tt-est">Estimativa: naquela noite só o total nacional foi publicado. Cada estado parte do seu resultado final, ajustado pela variação nacional daquela hora, e enche conforme o % apurado. No 2º turno, cada estado é gravado de verdade a cada minuto.</div>`:""}`
+    ${hasStates||est?`<div class="k">Estados liderados naquele momento: ${Object.entries(lead).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<b style="color:${colors[n]}">${esc(names[n]||n)} ${c}</b>`).join(" · ")}</div>${est?`<div class="k tt-est">Estimativa: naquela noite só o total nacional foi publicado. Cada estado parte do seu resultado final, ajustado pela variação nacional daquela hora, naquela hora. No 2º turno, cada estado é gravado de verdade a cada minuto.</div>`:""}`
       :`<div class="k">Neste turno a página só tem a curva nacional${S.turno===1?" (reconstituída dos boletins)":""}. No 2º turno, o mapa também volta no tempo, estado por estado.</div>`}`;
   const mb=$("#ttMap"); if(mb){ if(!GEO.br&&!GEO.brTried) loadBR(); const W=Math.max(260,mb.clientWidth), H=Math.max(240,mb.clientHeight||W), keep=S.mapSel;
     const fillU=u=>{ const x=st[u]; if(!x) return NODATA; const k=Object.keys(x.v).sort((a,b)=>x.v[b]-x.v[a]); const d=(x.v[k[0]]||0)-(x.v[k[1]]||0); return mix(PANEL,colors[k[0]]||"#888",.35+.65*clamp(d/15,0,1)); };
-    const lvU=u=>st[u]?clamp(st[u].p/100,0,1):null;
     /* durante o "Reproduzir" só troca cor e nível dos estados que já estão desenhados; refaz o SVG só se o tamanho
        ou o conjunto de estados com dados mudar */
     const sv=mb.querySelector("svg.mapsvg");
-    const same=sv && sv.dataset.w==W && sv.dataset.g===(GEO.br?"g":"t") && UFS.every(u=>!!st[u]===!!sv.querySelector(`g[data-uf="${u}"] rect.lv`));
-    if(same){ sv.querySelectorAll("g[data-uf]").forEach(g=>{ const u=g.dataset.uf, f=fillU(u), r=g.querySelector("rect.lv"); if(!r) return;
-        g.querySelector("path.st").setAttribute("fill",mix(PANEL,f,.55)); r.setAttribute("fill",f); r.style.transform=`scaleY(${lvU(u)})`; }); }
-    else { mb.innerHTML=brMapSVG(W,H,fillU,null,null,u=>u.toUpperCase(),"",lvU); S.mapSel=keep;
-      const nv=mb.querySelector("svg.mapsvg"); if(nv){ nv.dataset.w=W; nv.dataset.g=GEO.br?"g":"t"; }
-      mb.querySelectorAll("rect.lv").forEach(r=>{ r.style.transition="none"; r.style.transform=`scaleY(${r.dataset.lv})`; }); }
+    const same=sv && sv.dataset.w==W && sv.dataset.g===(GEO.br?"g":"t");
+    if(same){ sv.querySelectorAll("g[data-uf]").forEach(g=>{ const p=g.querySelector("path.st"); if(p) p.setAttribute("fill",fillU(g.dataset.uf)); }); }
+    else { mb.innerHTML=brMapSVG(W,H,fillU,null,null,u=>u.toUpperCase()); S.mapSel=keep;
+      const nv=mb.querySelector("svg.mapsvg"); if(nv){ nv.dataset.w=W; nv.dataset.g=GEO.br?"g":"t"; } }
     S.mapSel=keep; }
 }
 let TTI=null;
@@ -1818,7 +1816,7 @@ function brMapSVG(W,H,fillOf,focus,sel,labelOf,defs,levelOf){
     if(lv==null||full===NODATA||String(full).startsWith("url(")) return `<g class="${gcls(uf)}" data-uf="${uf}"${dl}><path class="st" d="${d}" fill="${full}"/></g>`;
     clip+=`<clipPath id="${cpx}${uf}"><path d="${d}"/></clipPath>`;
     const [[x0,y0],[x1,y1]]=box;
-    return `<g class="${gcls(uf)}" data-uf="${uf}"${dl}><path class="st" d="${d}" fill="${mix(PANEL,full,.55)}"/><rect class="lv" clip-path="url(#${cpx}${uf})" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1-x0).toFixed(1)}" height="${(y1-y0).toFixed(1)}" fill="${full}" data-lv="${clamp(lv,0,1).toFixed(4)}" data-cx="${cx.toFixed(0)}"/><path class="edge" d="${d}"/></g>`;
+    return `<g class="${gcls(uf)}" data-uf="${uf}"${dl}><path class="st" d="${d}" fill="${mix(PANEL,full,.55)}"/><g clip-path="url(#${cpx}${uf})"><rect class="lv" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1-x0).toFixed(1)}" height="${(y1-y0).toFixed(1)}" fill="${full}" data-lv="${clamp(lv,0,1).toFixed(4)}" data-cx="${cx.toFixed(0)}"/></g><path class="edge" d="${d}"/></g>`;
   };
   if(GEO.br && window.d3){
     const fit=GEO.br.filter(x=>!focus||focus.includes(x.uf));
@@ -1846,14 +1844,14 @@ function swapMap(root,key){ const sv=root.querySelector("svg.mapsvg"); if(!sv) r
 function animateLevels(root,key){
   const rs=[...root.querySelectorAll("rect.lv")]; if(!rs.length) return;
   /* aba em segundo plano não desenha quadros: sem isso o nível ficaria parado no valor antigo até a pessoa voltar */
-  if(document.hidden){ rs.forEach(r=>{ r.style.transition="none"; r.style.transform=`scaleY(${r.dataset.lv})`; }); LVM[key]=Object.fromEntries(rs.map(r=>[r.parentNode.dataset.uf,+r.dataset.lv])); return; }
+  if(document.hidden){ rs.forEach(r=>{ r.style.transition="none"; r.style.transform=`scaleY(${r.dataset.lv})`; }); LVM[key]=Object.fromEntries(rs.map(r=>[r.closest("[data-uf]").dataset.uf,+r.dataset.lv])); return; }
   const first=!LVM[key]; const prev=LVM[key]||{}; const xs=rs.map(r=>+r.dataset.cx), mn=Math.min(...xs), mx=Math.max(...xs)||1;
-  rs.forEach(r=>{ const uf=r.parentNode.dataset.uf, to=+r.dataset.lv, from=prev[uf]??0;
+  rs.forEach(r=>{ const uf=r.closest("[data-uf]").dataset.uf, to=+r.dataset.lv, from=prev[uf]??0;
     r.style.transition="none"; r.style.transform=`scaleY(${from})`;
     if(first) r.style.transitionDelay=`${((+r.dataset.cx-mn)/(mx-mn||1)*400).toFixed(0)}ms`; });
   root.getBoundingClientRect();
   requestAnimationFrame(()=>rs.forEach(r=>{ r.style.transition=""; r.style.transform=`scaleY(${r.dataset.lv})`; }));
-  LVM[key]=Object.fromEntries(rs.map(r=>[r.parentNode.dataset.uf,+r.dataset.lv]));
+  LVM[key]=Object.fromEntries(rs.map(r=>[r.closest("[data-uf]").dataset.uf,+r.dataset.lv]));
 }
 function worldMapSVG(W,H,byIso,colors){
   if(!GEO.world||!window.d3) return `<div class="chempty">${GEO.worldTried?"O mapa-múndi não carregou. Os resultados por país estão na tabela abaixo.":"Carregando mapa-múndi…"}</div>`;
