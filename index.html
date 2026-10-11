@@ -876,6 +876,25 @@ body.tv .wrap{padding-bottom:84px}
 .side.r>div:last-child{display:flex;flex-direction:column;align-items:flex-end}
 .side .num{font-size:clamp(36px,30cqi,86px)}
 @media (min-width:901px) and (max-width:1240px){.side{flex-direction:column;align-items:flex-start}.side.r{flex-direction:column;align-items:flex-end}.side>div:last-child{width:100%}}
+
+/* ---------- faixa rolante de últimas atualizações ---------- */
+#crawl{position:fixed;left:0;right:0;bottom:0;z-index:25;display:flex;align-items:stretch;height:38px;background:rgba(6,9,17,.95);border-top:1px solid var(--line2);font:500 13.5px var(--sans);font-variant-numeric:tabular-nums;padding-bottom:env(safe-area-inset-bottom,0px)}
+.cr-tag{display:flex;align-items:center;padding:0 14px;background:var(--bad);color:#fff;font:650 11.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;flex:none}
+.cr-box,.tvb-news{position:relative;flex:1;min-width:0;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
+.cr-track{display:flex;width:max-content;height:100%;align-items:center;animation:crawl var(--dur,40s) linear infinite}
+.cr-box:hover .cr-track,.tvb-news:hover .cr-track{animation-play-state:paused}
+.cr-run{display:flex;align-items:center;flex:none}
+.cr-i{display:inline-flex;align-items:center;white-space:nowrap;color:var(--text);padding-right:48px}
+.cr-i time{color:var(--c);font-weight:650;margin-right:9px}
+.cr-i:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:14px;opacity:.7}
+@keyframes crawl{to{transform:translateX(-50%)}}
+body.has-crawl .wrap{padding-bottom:96px}
+body.has-crawl #toasts{bottom:56px}
+body.tv #crawl{display:none}
+#tvbar .tvb-news{padding:0;font-size:16px}
+.tt-est{margin-top:8px;font-size:12px;color:var(--dim)}
+@media (max-width:560px){#crawl{height:34px;font-size:12.5px}.cr-tag{padding:0 10px;font-size:10.5px}}
+@media (prefers-reduced-motion:reduce){.cr-track{animation:none}.cr-box,.tvb-news{overflow-x:auto}}
 /* ---------- ajuda de atalhos ---------- */
 .kgrid{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:16px 0 4px;font-size:14px}
 kbd{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:7px;background:var(--panel3);font:600 12.5px var(--sans);color:var(--text)}
@@ -1117,13 +1136,14 @@ const SEED1 = [
   [90.61,"20:21",{"22":48.02,"13":44.01}],
   [92.58,"20:41",{"22":47.84,"13":44.2}],
   [96.44,"20:55",{"22":47.51,"13":44.59}],
+  [98.2,"21:05",{"22":47.33,"13":44.81}],
   [98.97,"21:12",{"22":47.22,"13":44.94}],
   [99.28,"21:25",{"22":47.17,"13":45.0}],
   [99.37,"21:30",{"22":47.15,"13":45.01}],
   [99.69,"21:52",{"22":47.1,"13":45.08}],
   [99.78,"22:03",{"22":47.08,"13":45.1}],
   [100.0,"23:52",{"22":47.03,"13":45.16}]];
-const SEEDV = 3;
+const SEEDV = 4;
 function seedTurno1(){
   if(S.turno!==1) return; const key=histKey("pres:BR"), h=hist("pres:BR");
   if(h.some(e=>e.seed===SEEDV)) return;
@@ -1512,15 +1532,23 @@ function ttRun(){
   const e=atT("pres:BR",T); if(!e) return;
   const ns=Object.keys(e.v).sort((a,b)=>e.v[b]-e.v[a]).slice(0,2);
   const st={}; const lead={};
-  [...UFS,"zz"].forEach(u=>{ const x=atT("pres:"+u,T); if(x){ st[u]=x; const top=Object.keys(x.v).sort((a,b)=>x.v[b]-x.v[a])[0]; lead[top]=(lead[top]||0)+1; } });
+  /* 1º turno: naquela noite só a curva nacional foi publicada. Cada estado é estimado pelo seu resultado final,
+     deslocado pela diferença entre o nacional daquele momento e o nacional final. No 2º turno o gravador central
+     guarda cada estado de verdade, a cada minuto, e a estimativa não é usada */
+  const t1est=S.turno===1, natF={}; if(t1est) br.cands.forEach(c=>natF[c.n]=c.pct); let est=false;
+  [...UFS,"zz"].forEach(u=>{ let x=atT("pres:"+u,T);
+    if(!x && t1est && P.ufs[u]?.val){ const f=P.ufs[u], v={}; f.cands.slice(0,4).forEach(c=>{ v[c.n]=clamp(c.pct+((e.v[c.n]??natF[c.n]??0)-(natF[c.n]??0)),0,100); }); x={p:e.p,t:e.t,v}; est=true; }
+    if(x){ st[u]=x; const top=Object.keys(x.v).sort((a,b)=>x.v[b]-x.v[a])[0]; lead[top]=(lead[top]||0)+1; } });
   const hasStates=Object.keys(st).length>0 || UFS.some(u=>hist("pres:"+u).length);
   $("#ttInfo").innerHTML=`<div class="k">Às <b style="color:var(--text)">${hhmm(e.t)}</b> · ${pf(e.p)} apurado</div>
     ${ns.map(n=>`<div class="ttc" style="--c:${colors[n]||"#888"}"><span>${esc(names[n]||n)}</span><b>${pf(e.v[n])}</b></div>`).join("")}
     ${tugHTML(e.v[ns[0]],e.v[ns[1]],colors[ns[0]],colors[ns[1]],"margin:8px 0 12px")}
-    ${hasStates?`<div class="k">Estados liderados naquele momento: ${Object.entries(lead).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<b style="color:${colors[n]}">${esc(names[n]||n)} ${c}</b>`).join(" · ")}</div>`
+    ${hasStates||est?`<div class="k">Estados liderados naquele momento: ${Object.entries(lead).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<b style="color:${colors[n]}">${esc(names[n]||n)} ${c}</b>`).join(" · ")}</div>${est?`<div class="k tt-est">Estimativa: naquela noite só o total nacional foi publicado. Cada estado parte do seu resultado final, ajustado pela variação nacional daquela hora, e enche conforme o % apurado. No 2º turno, cada estado é gravado de verdade a cada minuto.</div>`:""}`
       :`<div class="k">Neste turno a página só tem a curva nacional${S.turno===1?" (reconstituída dos boletins)":""}. No 2º turno, o mapa também volta no tempo, estado por estado.</div>`}`;
   const mb=$("#ttMap"); if(mb){ if(!GEO.br&&!GEO.brTried) loadBR(); const W=Math.max(260,mb.clientWidth), H=Math.max(240,mb.clientHeight||W), keep=S.mapSel;
-    mb.innerHTML=brMapSVG(W,H,u=>{ const x=st[u]; if(!x) return NODATA; const k=Object.keys(x.v).sort((a,b)=>x.v[b]-x.v[a]); const d=(x.v[k[0]]||0)-(x.v[k[1]]||0); return mix(PANEL,colors[k[0]]||"#888",.35+.65*clamp(d/15,0,1)); },null,null,u=>u.toUpperCase()); S.mapSel=keep; }
+    mb.innerHTML=brMapSVG(W,H,u=>{ const x=st[u]; if(!x) return NODATA; const k=Object.keys(x.v).sort((a,b)=>x.v[b]-x.v[a]); const d=(x.v[k[0]]||0)-(x.v[k[1]]||0); return mix(PANEL,colors[k[0]]||"#888",.35+.65*clamp(d/15,0,1)); },null,null,u=>u.toUpperCase(),"",u=>st[u]?clamp(st[u].p/100,0,1):null); S.mapSel=keep;
+    /* nível de cada estado = % apurado naquela hora (sem transição: durante o "Reproduzir" o mapa é redesenhado várias vezes por segundo) */
+    mb.querySelectorAll("rect.lv").forEach(r=>{ r.style.transition="none"; r.style.transform=`scaleY(${r.dataset.lv})`; }); }
 }
 let TTI=null;
 function ttPlay(){
@@ -2756,15 +2784,32 @@ function checkCelebrate(){
 let TKI=null, TKN=0;
 function tickerItems(){ const base=(S.turno===2&&SRV.ok)?[...feed().filter(e=>e.t>SRV.lastT),...SRV.feed]:feed();
   return base.filter(e=>e.type!=="tick").slice(0,6).map(e=>({t:hhmm(e.t),txt:e.html.replace(/<[^>]+>/g,""),col:e.col})); }
+/* faixa rolante: os últimos acontecimentos passam da direita para a esquerda, em loop. Só recomeça quando chega novidade */
+function crawlItems(){
+  const br=D().pres.br, it=(S.turno===2&&!br?.val)?[]:tickerItems();
+  if(it.length) return it;
+  if(S.turno===2 && !br?.val) return [{t:"",txt:ELEC_DAY2-Date.now()>0?`2º turno no domingo, 25 de outubro. A apuração começa às 17h e esta faixa passa a mostrar cada novidade do TSE.`:"Aguardando os primeiros dados do TSE."}];
+  return [{t:"",txt:"As novidades da apuração aparecem aqui assim que o TSE publicar."}];
+}
+function setCrawl(box){
+  if(!box) return; const it=crawlItems(), key=it.map(x=>x.t+x.txt).join("|"); if(box.dataset.k===key) return; box.dataset.k=key;
+  const one=it.map(x=>`<span class="cr-i" style="--c:${x.col||"var(--accent)"}">${x.t?`<time>${x.t}</time>`:""}${esc(x.txt)}</span>`).join("");
+  box.innerHTML=`<div class="cr-track"><div class="cr-run">${one}</div><div class="cr-run" aria-hidden="true">${one}</div></div>`;
+  const run=box.querySelector(".cr-run"); requestAnimationFrame(()=>{ const w=run.scrollWidth||1200; box.style.setProperty("--dur",Math.max(20,w/70).toFixed(1)+"s"); });
+}
+function crawl(){
+  let c=$("#crawl"); if(!c){ c=document.createElement("div"); c.id="crawl"; c.setAttribute("aria-label","Últimas atualizações"); c.innerHTML=`<span class="cr-tag">Últimas</span><div class="cr-box"></div>`; document.body.appendChild(c); document.body.classList.add("has-crawl"); }
+  setCrawl(c.querySelector(".cr-box")); const tb=$("#tvbar .tvb-news"); if(tb) setCrawl(tb);
+}
 function tvBar(on){
   let b=$("#tvbar");
   if(!on){ b?.remove(); clearInterval(TKI); TKI=null; return; }
-  if(!b){ b=document.createElement("div"); b.id="tvbar"; document.body.appendChild(b); }
-  const draw=()=>{ const br=D().pres.br, it=tickerItems(), x=it.length?it[TKN%it.length]:null; TKN++;
-    b.innerHTML=`<span class="tvb-brand">Apuração <em>2026</em></span><span class="tvb-live${br&&br.pct<100?"":" off"}">${br&&br.pct<100?"Ao vivo":"Encerrada"}</span>
-      <span class="tvb-clock">${hhmm(Date.now())}</span><span class="tvb-apu">${br?apu1(br.pct)+"% apurado":"aguardando o TSE"}</span>
-      <span class="tvb-news">${x?`<span class="tvb-item" style="--c:${x.col||"var(--accent)"}"><time>${x.t}</time>${esc(x.txt)}</span>`:""}</span>`; };
-  draw(); clearInterval(TKI); TKI=setInterval(draw,7000);
+  if(!b){ b=document.createElement("div"); b.id="tvbar"; b.innerHTML=`<span class="tvb-brand">Apuração <em>2026</em></span><span class="tvb-live"></span><span class="tvb-clock"></span><span class="tvb-apu"></span><span class="tvb-news"></span>`; document.body.appendChild(b); }
+  const draw=()=>{ const br=D().pres.br, live=br&&br.pct<100, lv=b.querySelector(".tvb-live");
+    lv.textContent=live?"Ao vivo":"Encerrada"; lv.classList.toggle("off",!live);
+    b.querySelector(".tvb-clock").textContent=hhmm(Date.now()); b.querySelector(".tvb-apu").textContent=br?apu1(br.pct)+"% apurado":"aguardando o TSE";
+    setCrawl(b.querySelector(".tvb-news")); };
+  draw(); clearInterval(TKI); TKI=setInterval(draw,15000);
 }
 
 /* ============ NOITE DE APURAÇÃO: aba, ícone, placar fixo, telão, atalhos ============ */
@@ -2815,7 +2860,7 @@ function updateMiniBoard(){
   SBIO=new IntersectionObserver(([e])=>top.classList.toggle("sb",!e.isIntersecting&&e.boundingClientRect.top<0),{rootMargin:`-${top.offsetHeight}px 0px 0px 0px`});
   SBIO.observe(board);
 }
-function postRender(){ updateTitle(); updateMiniBoard(); checkCelebrate(); if(document.body.classList.contains("tv")) tvBar(true); }
+function postRender(){ updateTitle(); updateMiniBoard(); checkCelebrate(); crawl(); if(document.body.classList.contains("tv")) tvBar(true); }
 setInterval(updateTitle,15000);
 
 /* telão: tela cheia só com placar e mapa, e a tela do celular ou da TV fica acesa */
