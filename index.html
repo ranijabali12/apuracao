@@ -2139,10 +2139,10 @@ async function munCfg(e){ if(!MUN.cfg[e]) MUN.cfg[e]=getJSON(U.cfg(e)).then(j=>{
 function munT1(){ if(!MUN.t1) MUN.t1=munJSON("mun/t1.json"); return MUN.t1; }
 /* ao vivo: todos os municípios de um estado, de 10 em 10, no máximo a cada 2 minutos */
 /* contido de propósito: o TSE bloqueia por alguns minutos o IP que pede demais (HTTP 429), e esse bloqueio derrubaria
-   também o placar. Por isso: 4 arquivos por vez, no máximo a cada 5 min, só com o mapa na tela, e 10 min de pausa no 429 */
+   também o placar. Por isso: 4 arquivos por vez, no máximo a cada 15 min, só com o mapa na tela, e 10 min de pausa no 429 */
 async function munLive(uf){
   /* devolve true só quando trouxe dados novos: quem chama redesenha apenas nesse caso (senão vira um ciclo) */
-  if(MUN.loading[uf] || Date.now()<(MUN.pause||0) || (MUN.liveT[uf] && Date.now()-MUN.liveT[uf]<300000)) return false;
+  if(MUN.loading[uf] || Date.now()<(MUN.pause||0) || (MUN.liveT[uf] && Date.now()-MUN.liveT[uf]<900000)) return false;
   const box=$("#munBox"), r=box?.getBoundingClientRect(); if(!r||r.bottom<0||r.top>innerHeight||document.hidden) return false;
   MUN.loading[uf]=true; let hit429=false;
   try{ const e=S.eles[2].fed, cfg=await munCfg(e), list=Object.entries(cfg).filter(([,x])=>x.uf===uf), m={...(MUN.live[uf]||{})};
@@ -2199,7 +2199,7 @@ async function drawMun(force){
     box.innerHTML=""; const wrap=document.createElement("div"); wrap.className="munwrap"; wrap.append(cv,ov); box.appendChild(wrap);
     ov.addEventListener("click",munClick);
     $("#munLeg").innerHTML=(base.slice(0,2).map(c=>`<span><i style="background:${colors[c.n]}"></i>${esc(shortName(c.nm))} venceu</span>`).join(""))+
-      (src==="live"?(uf?`<span>${MUN.loading[uf]&&!MUN.live[uf]?"Buscando os municípios no TSE…":`atualizado às ${MUN.liveT[uf]?hhmm(MUN.liveT[uf]):"—"} · a cada 5 min`}</span>`:`<span>Escolha um estado para ver os municípios ao vivo</span>`):"")+
+      (src==="live"?(uf?`<span>${MUN.loading[uf]&&!MUN.live[uf]?"Buscando os municípios no TSE…":`atualizado às ${MUN.liveT[uf]?hhmm(MUN.liveT[uf]):"—"} · a cada 15 min`}</span>`:`<span>Escolha um estado para ver os municípios ao vivo</span>`):"")+
       `<span>cor mais forte = vitória mais folgada</span>`;
   }catch(e){ box.innerHTML=`<div class="chempty">Não consegui carregar o mapa dos municípios agora.</div>`; }
   finally{ MUN.busy=false; }
