@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0B0C0E">
+<meta name="theme-color" content="#1E1D1B">
 <title>Apuração 2026 · 2º turno</title>
 <meta name="description" content="Apuração ao vivo das eleições de 2026: presidente e governadores, mapa por estado, evolução da contagem e alertas, direto dos dados públicos do TSE.">
 <meta property="og:title" content="Apuração 2026 · ao vivo">
 <meta property="og:description" content="Presidente e governadores, estado por estado, direto dos dados do TSE.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305080F'/%3E%3Crect x='7' y='17' width='4' height='8' rx='1' fill='%23D4F25B'/%3E%3Crect x='14' y='11' width='4' height='14' rx='1' fill='%23D4F25B'/%3E%3Crect x='21' y='6' width='4' height='19' rx='1' fill='%23D4F25B' opacity='.55'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305080F'/%3E%3Crect x='7' y='17' width='4' height='8' rx='1' fill='%23F08A24'/%3E%3Crect x='14' y='11' width='4' height='14' rx='1' fill='%23F08A24'/%3E%3Crect x='21' y='6' width='4' height='19' rx='1' fill='%23F08A24' opacity='.55'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet">
@@ -402,7 +402,7 @@ svg path.hov{transition:opacity .15s ease-in-out}
    Uma família só (Geist), números grandes e tabulares. Ouro da bandeira como único destaque. */
 :root{
   --bg:#070C18; --panel:#0D1526; --panel2:#131D33; --panel3:#18233D; --line:#1A2540; --line2:#26324F;
-  --text:#E8ECF5; --muted:#8A96B3; --dim:#5D6886; --accent:#D4F25B; --ok:#3CCB7F; --bad:#F0605D;
+  --text:#E8ECF5; --muted:#8A96B3; --dim:#5D6886; --accent:#F08A24; --ok:#3CCB7F; --bad:#F0605D;
   --serif:"Geist", "Helvetica Neue", Arial, sans-serif; --sans:"Geist", "Helvetica Neue", Arial, sans-serif; --mono:"Geist", "Helvetica Neue", Arial, sans-serif;
   --r1:20px; --r2:14px; --r3:10px; --r4:7px;
   --e:cubic-bezier(.4,0,.2,1);
@@ -427,7 +427,7 @@ h1,h2,h3,.brand b,.maphead h2,.card h3,.wait h2,.side .nm,.detail .hd b,.citycar
 .ref{font-size:12.5px;color:var(--dim)}
 .ref select,.cd{background:var(--panel);border:1px solid var(--line);border-radius:var(--r4);color:var(--muted);font:500 12.5px var(--sans)}
 .cd:hover,.ref select:hover{color:var(--text);border-color:var(--line2)}
-#bell[aria-pressed="true"]{color:var(--accent);border-color:rgba(212,242,91,.4);background:var(--panel)}
+#bell[aria-pressed="true"]{color:var(--accent);border-color:rgba(240,138,36,.4);background:var(--panel)}
 
 /* superfícies em camadas: o raio diminui conforme o elemento fica menor */
 .wrap{padding:22px 24px 72px}
@@ -467,7 +467,7 @@ h1,h2,h3,.brand b,.maphead h2,.card h3,.wait h2,.side .nm,.detail .hd b,.citycar
 .chip.no{border-color:var(--line2);color:var(--muted)}
 .dec{border-radius:var(--r3);padding:11px 13px}
 .dec.win{background:rgba(60,203,127,.08);border:1px solid rgba(60,203,127,.3)} .dec.win .ic{background:var(--ok);color:#06210F}
-.dec.t2{background:rgba(212,242,91,.07);border:1px solid rgba(212,242,91,.28)} .dec.t2 .ic{background:var(--accent);color:#2A1E00}
+.dec.t2{background:rgba(240,138,36,.07);border:1px solid rgba(240,138,36,.28)} .dec.t2 .ic{background:var(--accent);color:#2A1E00}
 .dec.pend{border:1px dashed var(--line2);background:transparent;color:var(--muted)} .dec.pend .ic{background:var(--line2)}
 .others{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3)}
 .citybar{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);transition:border-color .2s var(--e),background .2s var(--e)}
@@ -512,7 +512,7 @@ svg path.hov{stroke:var(--text);stroke-width:1.8;filter:none}
 .x:hover{color:var(--text);border-color:var(--muted)}
 .ev time{font:500 12.5px var(--sans);color:var(--dim)}
 .ev .d{border-radius:3px}
-@keyframes flash{0%{background:rgba(212,242,91,.1)}100%{background:transparent}}
+@keyframes flash{0%{background:rgba(240,138,36,.1)}100%{background:transparent}}
 .tbl th{font:500 12.5px var(--sans);color:var(--dim);border-bottom:1px solid var(--line2)}
 .tbl th.on,.tbl th:hover{color:var(--text)}
 .tbl td{border-bottom:1px solid var(--line)}
@@ -581,7 +581,7 @@ svg path.hov{stroke:var(--text);stroke-width:1.8;filter:none}
    ===================================================================== */
 :root{
   --bg:#05080F; --panel:#0B111F; --panel2:#101829; --panel3:#162034; --line:#172137; --line2:#233050;
-  --text:#ECEFF6; --muted:#8D98B4; --dim:#5F6A88; --accent:#D4F25B; --ok:#3CCB7F; --bad:#F0605D;
+  --text:#ECEFF6; --muted:#8D98B4; --dim:#5F6A88; --accent:#F08A24; --ok:#3CCB7F; --bad:#F0605D;
   --display:var(--sans); --mono:var(--sans);
   /* curvas: entrada (ease-out forte), movimento na tela (ease-in-out forte), saída (ease-in), mola leve */
   --out:cubic-bezier(.23,1,.32,1); --io:cubic-bezier(.77,0,.175,1); --in:cubic-bezier(.55,.06,.68,.19); --spring:cubic-bezier(.34,1.45,.64,1);
@@ -591,12 +591,12 @@ svg path.hov{stroke:var(--text);stroke-width:1.8;filter:none}
 
 body{background:var(--bg);
   background-image:
-    radial-gradient(900px 420px at 50% -180px, rgba(212,242,91,.075), transparent 70%),
+    radial-gradient(900px 420px at 50% -180px, rgba(240,138,36,.075), transparent 70%),
     radial-gradient(1400px 700px at 50% -300px, rgba(48,74,140,.22), transparent 72%);
   background-repeat:no-repeat}
 /* sem camada de grão em tela cheia: um overlay fixo com mix-blend-mode obrigava o navegador a recompor a página
    inteira a cada quadro de animação do mapa (era o que deixava a entrada do mapa e a rolagem lentas) */
-::selection{background:rgba(212,242,91,.28);color:#fff}
+::selection{background:rgba(240,138,36,.28);color:#fff}
 .skip{position:fixed;left:16px;top:-60px;z-index:100;background:var(--accent);color:#1d1500;font-weight:600;padding:9px 14px;border-radius:10px;text-decoration:none;transition:top .2s var(--out)}
 .skip:focus{top:12px}
 p,.k{text-wrap:pretty} h2,h3{text-wrap:balance}
@@ -675,7 +675,7 @@ svg path.hov{transition:opacity .1s linear}
 .stats b{font-size:21px}
 .tug i,.prog i,.mini i,.cc .bar i{transition:width .7s var(--out)}
 .prog{height:3px}
-.prog i{box-shadow:0 0 12px rgba(212,242,91,.5)}
+.prog i{box-shadow:0 0 12px rgba(240,138,36,.5)}
 .rw{transition:background-color .15s var(--out)}
 .check .chev{transition:transform .22s var(--out)}
 /* "Conferência" abre com altura animada (Chrome/Edge 131+; nos outros abre direto) */
@@ -697,7 +697,7 @@ svg path.hov{transition:opacity .1s linear}
 @keyframes boxIn{from{opacity:0;transform:translateY(8px) scale(.98)}}
 .tst{background:rgba(22,32,52,.92);backdrop-filter:blur(14px);border:1px solid var(--line2);border-left:1px solid var(--line2);box-shadow:inset 3px 0 0 var(--accent),0 18px 40px -12px rgba(0,0,0,.7);animation:tin2 .28s var(--out)}
 .tst.out{opacity:0;transform:translateX(8px);transition:opacity .18s var(--in),transform .18s var(--in)}
-.btn{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 10px 24px -10px rgba(212,242,91,.55);transition:filter .15s var(--out),transform .15s var(--out),box-shadow .2s var(--out)}
+.btn{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 10px 24px -10px rgba(240,138,36,.55);transition:filter .15s var(--out),transform .15s var(--out),box-shadow .2s var(--out)}
 .btn:active{transform:scale(.97)}
 
 /* ---------- troca de página ---------- */
@@ -711,7 +711,7 @@ svg path.hov{transition:opacity .1s linear}
 /* ---------- espera do 2º turno: a única tela que pode respirar ---------- */
 .card.wait2{position:relative;isolation:isolate}
 .wait2 .w-l{position:relative;overflow:hidden}
-.wait2 .w-l:before{content:"25·10";position:absolute;right:-18px;bottom:-46px;z-index:-1;font:700 220px/1 var(--sans);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(212,242,91,.09);pointer-events:none}
+.wait2 .w-l:before{content:"25·10";position:absolute;right:-18px;bottom:-46px;z-index:-1;font:700 220px/1 var(--sans);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(240,138,36,.09);pointer-events:none}
 .wait2 h2{font-size:56px;line-height:1;max-width:12ch}
 .cdn{gap:8px}
 .cdn .u{position:relative;background:linear-gradient(180deg,var(--panel3),var(--panel2));border-color:var(--line2);border-radius:16px;padding:16px 0 12px}
@@ -724,14 +724,14 @@ svg path.hov{transition:opacity .1s linear}
 .wait2 .pre-c .pic{width:64px;height:78px}
 .wait2 .pre-c .pc{font-size:30px}
 @media (max-width:420px){.wait2 .pre-c .pc{font-size:24px}.wait2 .pre-c .nm{font-size:15px}}
-.cdn .u:last-child{border-color:rgba(212,242,91,.35);box-shadow:0 0 0 4px rgba(212,242,91,.05)}
+.cdn .u:last-child{border-color:rgba(240,138,36,.35);box-shadow:0 0 0 4px rgba(240,138,36,.05)}
 .cdn small{font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
 /* dígito que muda rola de cima, rápido; só ele mexe */
 .cdn b.flip{animation:roll .32s var(--out)}
 @keyframes roll{from{transform:translateY(-38%);opacity:0}}
 .pre-c,.pre-r{position:relative;overflow:hidden}
 .pre-c:before,.pre-r:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:opacity .25s var(--out);
-  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(212,242,91,.55), transparent 60%);
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(240,138,36,.55), transparent 60%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 .pre-c:hover:before,.pre-r:hover:before{opacity:1}
 .pre-r:hover{transform:none}
@@ -752,7 +752,7 @@ svg path.hov{transition:opacity .1s linear}
 @media (max-width:1440px){.top.sb #turnoSeg,.top.sb .ref{display:none}}
 @media (max-width:1060px){.top.sb .minisb{margin-right:0}}
 @media (max-width:700px){.top.sb .live,.minisb .msn{display:none}.minisb{padding:4px 8px;gap:6px}.minisb .mbar{width:40px}}
-#tvBtn[aria-pressed="true"]{color:var(--accent);border-color:rgba(212,242,91,.4)}
+#tvBtn[aria-pressed="true"]{color:var(--accent);border-color:rgba(240,138,36,.4)}
 .x.lnk{margin-left:8px;padding:10px 14px;font-size:13.5px;border-radius:var(--r3)}
 
 /* ---------- telão: placar e mapa em tela cheia ---------- */
@@ -929,7 +929,7 @@ kbd{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 
    ===================================================================== */
 :root{
   --bg:#0B0C0E; --panel:#111316; --panel2:#16191D; --panel3:#1C2025; --line:#23272D; --line2:#30353C;
-  --text:#F2F2EF; --muted:#9CA2AA; --dim:#6C727A; --accent:#D4F25B;
+  --text:#F2F2EF; --muted:#9CA2AA; --dim:#6C727A; --accent:#F08A24;
   --r1:4px; --r2:3px; --r3:3px; --r4:2px;
 }
 body{background:var(--bg);background-image:none}
@@ -984,22 +984,111 @@ body{background:var(--bg);background-image:none}
 .cr-i:before{border-radius:0;width:5px;height:5px;background:var(--dim)}
 .tvb-brand{background:var(--text);color:#0B0C0E}
 .tvb-brand em{font-style:normal}
+
+/* =====================================================================
+   URNA (out/2026)
+   A linguagem visual vem da própria urna eletrônica, coisa que só uma eleição brasileira tem:
+   - carvão quente do teclado como fundo; papel do boletim de urna como cor do texto
+   - CONFIRMA (verde) = decidido: eleito, apuração concluída, botão principal
+   - CORRIGE (laranja) = em andamento ou em disputa: o acento da apuração e do 2º turno
+   - BRANCO = tecla neutra: a aba escolhida vira uma tecla branca
+   - botões e abas como teclas com relevo; número do candidato em caixinhas, como na tela da urna
+   Painéis separados por tom de fundo, sem filete e sem sombra. Raio varia com o tamanho: tecla 7, painel 12.
+   ===================================================================== */
+:root{
+  --bg:#1E1D1B; --panel:#272522; --panel2:#2F2C28; --panel3:#38352F; --line:#3A3631; --line2:#4B463F;
+  --text:#F1EDE4; --muted:#B4AEA3; --dim:#867F75;
+  --confirma:#2FA35B; --corrige:#F08A24; --branco:#F1EDE4; --tecla:#2C2A26; --tecla-sombra:#121110;
+  --accent:#F08A24; --ok:#2FA35B; --bad:#E5484D;
+  --r1:14px; --r2:12px; --r3:9px; --r4:7px;
+}
+body{background:var(--bg)}
+.top{background:rgba(30,29,27,.96);border-bottom:0;box-shadow:0 1px 0 var(--line)}
+.brand b{font-weight:650;letter-spacing:-.025em}
+.brand b em{font-style:normal;font-weight:650;color:var(--corrige)}
+/* painéis: tom de fundo, sem filete */
+.card,.board,.others,.note,.citybar,.check,.chempty{border:0!important}
+.card,.board{background:var(--panel)!important;border-radius:var(--r1)}
+.others,.note,.citybar{background:var(--panel)!important;border-radius:var(--r2)}
+.mid{background:var(--panel2)!important}
+.mtile,.dgrid div,.pre-c,.pre-r,.sim,.sg,.check{background:var(--panel2)!important;border:0!important;border-radius:var(--r2)!important}
+.mtile{box-shadow:none!important}
+.mtile .mbig{color:var(--c)}
+.chempty{background:var(--panel2);border-radius:var(--r2)}
+.foot{border-top:0}
+/* teclas */
+.seg,.modes{background:none!important;border:0!important;padding:0!important;gap:6px!important;display:flex}
+.seg .ind{display:none!important}
+.seg button,.modes button,.x,.cd,.munbar select,.citybar,.btn{border-radius:var(--r4)!important}
+.seg button,.modes button,.x,.cd,.munbar select{background:var(--tecla)!important;color:var(--text)!important;border:1px solid var(--line2)!important;border-bottom:3px solid var(--tecla-sombra)!important;
+  padding:6px 12px;font:550 13px var(--sans);transition:transform .08s var(--out),border-bottom-width .08s var(--out),background-color .12s var(--out)}
+.seg button:hover,.modes button:hover,.x:hover,.cd:hover{background:var(--panel3)!important}
+.seg button:active,.modes button:active,.x:active,.cd:active,.btn:active{transform:translateY(2px)!important;border-bottom-width:1px!important}
+.seg button[aria-pressed="true"],.modes button[aria-pressed="true"]{background:var(--branco)!important;color:#1E1D1B!important;border-color:#D8D2C6!important;border-bottom-color:#9E978A!important}
+#bell[aria-pressed="true"],#tvBtn[aria-pressed="true"]{color:var(--corrige)!important}
+.btn{background:var(--confirma)!important;color:#fff!important;border:0!important;border-bottom:3px solid #1D6D3B!important;font-weight:650}
+.btn:hover{background:#36B466!important}
+.x.lnk{background:transparent!important;border:0!important;color:var(--muted)!important;text-decoration:underline;text-underline-offset:3px}
+/* tecla de atualização: um texto e uma barra que esvazia até a próxima busca */
+.upd{position:relative;overflow:hidden;min-width:136px;justify-content:flex-start}
+.upd-t{font:550 12.5px var(--sans);color:var(--muted)}
+.upd-t b{color:var(--text);font-weight:650}
+.upd-bar{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--corrige);transform-origin:left;transition:transform 1s linear}
+.cd.spin .upd-t{opacity:.55}
+.ref{font-size:12.5px}
+.sw.ivl{gap:8px;margin-top:6px}
+.sw.ivl select{background:var(--tecla);color:var(--text);border:1px solid var(--line2);border-radius:var(--r4);padding:4px 6px;font:500 13px var(--sans)}
+/* número em caixinhas, como na tela da urna */
+.unum{display:inline-flex;gap:4px;margin:0 0 8px}
+.unum i{display:inline-grid;place-items:center;width:1.55em;height:1.9em;font:650 15px/1 var(--sans);font-style:normal;color:var(--text);border:1.5px solid var(--c,var(--line2));border-radius:3px;background:rgba(0,0,0,.18)}
+.side.r .unum{align-self:flex-end}
+.pre-c .unum i{font-size:13px}
+/* ao vivo, chips e decisão */
+.live{background:var(--bad);color:#fff;font:600 11.5px var(--sans);letter-spacing:0;text-transform:none;border-radius:var(--r4);padding:3px 8px}
+.live.off{background:var(--panel3);color:var(--dim)}
+.chip{border-radius:4px!important}
+.chip.win{background:var(--confirma);color:#fff}
+.chip.t2,.dec.t2 .ic{background:var(--corrige);color:#1E1D1B}
+.dec.win{background:rgba(47,163,91,.12)!important;border:0!important}
+.dec.t2{background:rgba(240,138,36,.12)!important;border:0!important}
+.dec.pend{border:1px dashed var(--line2)!important}
+.dec.win .ic{background:var(--confirma);color:#fff}
+.prog i,.mprob i:first-child{background:var(--corrige)}
+.side:after{height:4px;border-radius:0 0 4px 4px}
+.pic{border-radius:var(--r3)!important}
+/* espera do 2º turno */
+.cdn .u{border-left:0!important;padding-left:0!important}
+.cdn{gap:28px!important}
+.cdn .u:last-child b{color:var(--corrige)}
+.wait2 .pre-duel .vs{background:var(--panel2);box-shadow:none}
+/* faixa e etiquetas sem caixa alta */
+.cr-tag{text-transform:none;letter-spacing:0;font:650 12.5px var(--sans);background:var(--bad)}
+#crawl{background:#191816;border-top:0}
+.cr-i:before{border-radius:50%;background:var(--corrige);width:6px;height:6px}
+.tvb-live{text-transform:none!important;letter-spacing:0!important}
+.tvb-brand{background:var(--corrige);color:#1E1D1B}
+.minisb{background:var(--panel)!important;border:0!important;border-radius:var(--r3)!important}
+.minisb .mlive{text-transform:none;letter-spacing:0}
+.minisb .msn{text-transform:none!important;font-size:12.5px}
+.tip,.chtip{background:#33302B!important;border:0!important;border-radius:var(--r3)}
+#alertPanel,.mbox{background:var(--panel2);border:0;border-radius:var(--r2)}
+kbd{background:var(--tecla);border:1px solid var(--line2);border-bottom:3px solid var(--tecla-sombra)}
+.mhalf b{background:var(--panel)}
+.mtrack,.mprob,.pmbar,.tug,.prog,.mini,.cc .bar,.mbar{border-radius:3px!important}
+@media (max-width:700px){.upd{min-width:0}.upd-t{font-size:12px}}
 </style>
 </head>
 <body>
 <a class="skip" href="#app">Pular para o conteúdo</a>
 <header class="top"><div class="in">
-  <div class="brand"><b>Apuração <em>2026</em></b><span class="live" id="live"><i></i>ao vivo</span><span class="t" id="turnoLbl">2º turno · 25 de outubro</span></div>
+  <div class="brand"><b>Apuração <em>2026</em></b><span class="live" id="live"><i></i>ao vivo</span><span class="t" id="turnoLbl">2º turno, 25 de outubro</span></div>
   <button id="minisb" class="minisb" type="button"></button>
   <div class="ctrls">
   <div class="seg" id="turnoSeg"><button data-t="2" aria-pressed="true">2º turno</button><button data-t="1" aria-pressed="false">1º turno</button></div>
   <div class="seg" id="cargoSeg"><button data-c="pres" aria-pressed="true">Presidente</button><button data-c="gov" aria-pressed="false">Governador</button><button data-c="pol" aria-pressed="false">Quem foi eleito</button><button data-c="ana" aria-pressed="false">Análises</button></div>
   <button class="cd" id="tvBtn" title="Telão: tela cheia com placar e mapa (T)" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="15" height="10" rx="1.5"/><path d="M7 17h6M10 13.5V17"/></svg><span>Telão</span></button>
   <button class="cd" id="bell" title="Alertas" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5.5 2 6H3c.5-.5 2-2 2-6z"/><path d="M8 16.5a2 2 0 0 0 4 0"/></svg><span>Alertas</span></button>
-  <div class="ref">Atualiza a cada
-    <select id="ivl" aria-label="Intervalo de atualização"><option value="30" selected>30 s</option><option value="60">1 min</option><option value="120">2 min</option></select>
-    <button class="cd" id="cd" title="Atualizar agora"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.8 0 3.3.8 4.3 2.1"/><path d="M12.8 1.5v3.4H9.4"/></svg><span>—</span></button>
-  </div>
+  <div class="ref"><button class="cd upd" id="cd" title="Atualizar agora (R)"><span class="upd-t">Atualiza em <b>—</b></span><i class="upd-bar"></i></button></div>
   </div>
 </div></header>
 <div id="pbar" class="on"></div>
@@ -1033,7 +1122,7 @@ const ufRegion = uf => Object.keys(REG).find(r=>REG[r].includes(uf));
 const TILE = {rr:[1,0],ap:[3,0],am:[1,1],pa:[2,1],ma:[3,1],ce:[4,1],rn:[5,1],ac:[0,2],ro:[1,2],mt:[2,2],to:[3,2],pi:[4,2],pb:[5,2],go:[2,3],df:[3,3],ba:[4,3],pe:[5,3],al:[6,3],ms:[2,4],mg:[3,4],es:[4,4],se:[6,4],pr:[2,5],sp:[3,5],rj:[4,5],sc:[2,6],rs:[2,7]};
 
 const PARTY_COL = {PT:"#e8414e",PL:"#3e6ff0",MISSAO:"#f2c200",AVANTE:"#19b3a6",PSD:"#f08c2e",NOVO:"#ff7a1a",UP:"#c2255c",PSTU:"#d9480f",PCB:"#b5172b",PCO:"#8f1d3c",DC:"#4dabf7",DEMOCRATA:"#748ffc",REPUBLICANOS:"#20b2aa",MDB:"#2fb36b",UNIAO:"#9b6bff",PSDB:"#45b6e6",PP:"#5c7cfa",PSB:"#f59f00",PDT:"#e64980",PSOL:"#fab005",PODE:"#82c91e",PODEMOS:"#82c91e",SOLIDARIEDADE:"#ff8787",CIDADANIA:"#da77f2",PCDOB:"#c92a2a",REDE:"#12b886",PV:"#40c057",PRD:"#868e96"};
-const PALETTE = ["#D4F25B","#38d9a9","#b197fc","#66d9e8","#ff8fab","#c0a080","#a9e34b","#ffa94d","#e599f7"];
+const PALETTE = ["#F08A24","#38d9a9","#b197fc","#66d9e8","#ff8fab","#c0a080","#a9e34b","#ffa94d","#e599f7"];
 const PANEL = "#131D33", NODATA = "#18233D";
 
 /* cidades do exterior → país (nome, código ISO numérico do mapa-múndi) */
@@ -1183,6 +1272,8 @@ function colorMap(cands){
   return m;
 }
 const shortName = n => titleCase(n);
+/* número do candidato em caixinhas de dígito, como a tela da urna mostra ao digitar */
+const unum = n => `<span class="unum" aria-label="número ${esc(n)}">${String(n).split("").map(d=>`<i>${esc(d)}</i>`).join("")}</span>`;
 
 /* ============ ESTADO ============ */
 const S = {
@@ -1236,8 +1327,8 @@ function seedTurno1(){
 function seedFeed1(){
   const out=[{t:t1("17:00"),type:"info",html:"Urnas fechadas. Começa a apuração do 1º turno.",seed:SEEDV}];
   let lastM=-1;
-  SEED1.forEach(([p,hm,v])=>{ const m=p>=99?Math.floor(p*10)/10:Math.floor(p/10)*10; if(m===lastM) return; lastM=m; out.push({t:t1(hm),type:"mile",html:`Com <b>${pf(p)}</b> apurado: Flávio Bolsonaro ${pf(v["22"])} × Lula ${pf(v["13"])}.`,col:"#D4F25B",seed:SEEDV}); });
-  out.push({t:t1("20:59"),type:"win",html:"Confirmado: <b>Flávio Bolsonaro</b> e <b>Lula</b> vão disputar o 2º turno.",col:"#D4F25B",seed:SEEDV});
+  SEED1.forEach(([p,hm,v])=>{ const m=p>=99?Math.floor(p*10)/10:Math.floor(p/10)*10; if(m===lastM) return; lastM=m; out.push({t:t1(hm),type:"mile",html:`Com <b>${pf(p)}</b> apurado: Flávio Bolsonaro ${pf(v["22"])} × Lula ${pf(v["13"])}.`,col:"#F08A24",seed:SEEDV}); });
+  out.push({t:t1("20:59"),type:"win",html:"Confirmado: <b>Flávio Bolsonaro</b> e <b>Lula</b> vão disputar o 2º turno.",col:"#F08A24",seed:SEEDV});
   return out.sort((a,b)=>b.t-a.t);
 }
 const HC = {};
@@ -1327,8 +1418,8 @@ function govFill(u,m,addDef){
   if(g&&g.val&&S.turno===1&&m==="win"){ const d=decide(g,1); if(d?.k==="t2"){ const col=colorMap(g.cands);
     addDef(`<pattern id="gs1_${u}" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><rect width="8" height="8" fill="${col[d.a.n]}"/><rect width="4" height="8" fill="${col[d.b.n]}"/></pattern>`); return `url(#gs1_${u})`; } }
   if(g&&g.val) return fillFor(g,colorMap(g.cands),m);
-  if(m==="apu") return g?mix(PANEL,"#D4F25B",.28):NODATA;
-  const t=T1G.data?.[u]; if(!t) return g?mix(PANEL,"#D4F25B",.35):NODATA;
+  if(m==="apu") return g?mix(PANEL,"#F08A24",.28):NODATA;
+  const t=T1G.data?.[u]; if(!t) return g?mix(PANEL,"#F08A24",.35):NODATA;
   const f=S.turno===2?govFinalists(t):null;
   if(f){ const col=colorMap(t.cands); addDef(`<pattern id="gs_${u}" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><rect width="8" height="8" fill="${col[f[0].n]}"/><rect width="4" height="8" fill="${col[f[1].n]}"/></pattern>`); return `url(#gs_${u})`; }
   const w=t.cands.find(c=>statusOf(c)?.k==="win"); return w?mix(PANEL,partyCol(w.party),.5):NODATA;
@@ -1420,7 +1511,7 @@ function eventsFromSnaps(snaps,meta){
     if(!prev){ push(s.t,"info",`Primeiros resultados para presidente: ${pf(s.br.p)} apurado: ${duel(s.br)}.`); prev=s; continue; }
     const b=s.br, a=prev.br;
     if(b.st>a.st) push(s.t,"tick",`TSE atualizou: +${nf(b.st-a.st)} seções apuradas (${pf(b.p)}). ${duel(b)}.`);
-    const hit=MILES.filter(m=>a.p<m&&b.p>=m).pop(); if(hit!=null) push(s.t,"mile",`Apuração para presidente chega a <b>${hit===100?"100%":pf(b.p)}</b>: ${duel(b)}.`,"#D4F25B");
+    const hit=MILES.filter(m=>a.p<m&&b.p>=m).pop(); if(hit!=null) push(s.t,"mile",`Apuração para presidente chega a <b>${hit===100?"100%":pf(b.p)}</b>: ${duel(b)}.`,"#F08A24");
     if(lead(b)!==lead(a)) push(s.t,"leadbr",`${nm(lead(b))} passa à frente no Brasil, com ${pf(b.p)} apurado.`,pc[lead(b)]);
     if(b.d&&b.d!==a.d) push(s.t,"win",`${nm(b.d)} está eleito presidente.`,pc[b.d]);
     [...UFS,"zz"].forEach(u=>{ const x=s.u?.[u], y=prev.u?.[u]; if(!x) return;
@@ -1456,11 +1547,11 @@ function detectEvents(){
     const b=P.br;
     if(cur.br.st>prev.br.st) pushFeed("tick",`TSE atualizou: +${nf(cur.br.st-prev.br.st)} seções apuradas (${pf(b.pct)}). ${duel(b)}.`);
     const hit=MILES.filter(m=>prev.br.pct<m && cur.br.pct>=m).pop();
-    if(hit!=null) pushFeed("mile",`Apuração para presidente chega a <b>${hit===100?"100%":pf(b.pct)}</b>: ${duel(b)}.`,"#D4F25B");
+    if(hit!=null) pushFeed("mile",`Apuração para presidente chega a <b>${hit===100?"100%":pf(b.pct)}</b>: ${duel(b)}.`,"#F08A24");
     if(cur.br.lead && prev.br.lead && cur.br.lead!==prev.br.lead) pushFeed("leadbr",`${nm(b,cur.br.lead)} passa à frente no Brasil, com ${pf(b.pct)} apurado.`,pc[cur.br.lead]);
     if(cur.br.dec && cur.br.dec!==prev.br.dec){ const d=decide(b);
       if(d.k==="win") pushFeed("win",`${nm(b,d.x.n)} está eleito presidente${d.src==="conta"?" (matematicamente)":""}.`,pc[d.x.n]);
-      if(d.k==="t2") pushFeed("win",`Definido o 2º turno para presidente: ${nm(b,d.a.n)} × ${nm(b,d.b.n)}.`,"#D4F25B"); }
+      if(d.k==="t2") pushFeed("win",`Definido o 2º turno para presidente: ${nm(b,d.a.n)} × ${nm(b,d.b.n)}.`,"#F08A24"); }
   } else if(P.br && !prev.br){ pushFeed("info",`Primeiros resultados para presidente: ${pf(P.br.pct)} apurado: ${duel(P.br)}.`); }
   [...UFS,"zz"].forEach(u=>{ const a=prev.ufs[u], c=cur.ufs[u], d=P.ufs[u]; if(!c||!d) return;
     if((!a||a.pct<100) && c.pct>=100) pushFeed("state",`${UFNAME[u]} conclui a apuração para presidente: ${duel(d)}.`,pc[c.lead]);
@@ -1468,7 +1559,7 @@ function detectEvents(){
   Object.entries(cur.gov).forEach(([u,c])=>{ const a=prev.gov?.[u], d=G.ufs[u], gc=colorMap(d.cands);
     if(!a){ if(c.pct>0) pushFeed("info",`Governo ${deUF(u)}: primeiros votos apurados: ${duel(d)}.`); return; }
     if(c.dec && c.dec!==a.dec){ const x=decide(d); if(x?.k==="win") pushFeed("win",`${nm(d,x.x.n)} está eleito governador ${deUF(u)}${x.src==="conta"?" (matematicamente)":""}.`,gc[x.x.n]);
-      if(x?.k==="t2") pushFeed("win",`${UFNAME[u]} terá 2º turno para governador: ${nm(d,x.a.n)} × ${nm(d,x.b.n)}.`,"#D4F25B"); }
+      if(x?.k==="t2") pushFeed("win",`${UFNAME[u]} terá 2º turno para governador: ${nm(d,x.a.n)} × ${nm(d,x.b.n)}.`,"#F08A24"); }
     if(a.pct<100 && c.pct>=100) pushFeed("state",`Apuração para governador ${deUF(u)} concluída: ${duel(d)}.`,gc[c.lead]);
     else if(a.lead && c.lead!==a.lead && c.pct>=5) pushFeed("lead",`Virada em ${UFNAME[u]}: ${nm(d,c.lead)} passa à frente para governador.`,gc[c.lead]); });
   T.snap=cur; store.set("ap26_snap_"+S.turno,cur);
@@ -1590,6 +1681,7 @@ function alertPanelHTML(){
     <div class="k" style="margin:4px 0 10px">${perm==="granted"?"Notificações do navegador liberadas: chegam mesmo com a aba em segundo plano.":perm==="denied"?"O navegador bloqueou as notificações; os alertas aparecem só dentro da página, com som.":perm==="unsupported"?"Este navegador não tem notificações; os alertas aparecem dentro da página.":"Ao ativar, o navegador vai pedir permissão para mostrar notificações."}</div>
     ${ALERT_TYPES.map(([k,t])=>`<label class="sw"><input type="checkbox" data-al="t:${k}" ${A.types[k]?"checked":""}><span>${t}</span></label>`).join("")}
     <label class="sw"><input type="checkbox" data-al="sound" ${A.sound?"checked":""}><span>Tocar som</span></label>
+    <label class="sw ivl">Atualizar a cada <select id="ivl" aria-label="Intervalo de atualização">${[[30,"30 segundos"],[60,"1 minuto"],[120,"2 minutos"]].map(([v,t])=>`<option value="${v}" ${S.ivl===v?"selected":""}>${t}</option>`).join("")}</select></label>
     <button class="x" data-altest style="margin-top:10px">Testar alerta</button>
     <div class="k" style="margin-top:8px">Os alertas funcionam enquanto a página estiver aberta (pode ser em outra aba).</div>`;
 }
@@ -1727,7 +1819,7 @@ async function shareImage(fmt){
   const grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,"#0D1526"); grd.addColorStop(1,"#070C18"); g.fillStyle=grd; g.fillRect(0,0,W,H);
   const F=(w,s,f="Geist")=>`${w} ${s}px "${f}", Arial, sans-serif`;
   let y=story?150:80;
-  g.fillStyle="#D4F25B"; g.font=F(600,28,"Geist"); g.fillText(`APURAÇÃO 2026 · ${S.turno}º TURNO`,70,y);
+  g.fillStyle="#F08A24"; g.font=F(600,28,"Geist"); g.fillText(`APURAÇÃO 2026 · ${S.turno}º TURNO`,70,y);
   y+=58; g.fillStyle="#E8ECF5"; g.font=F(600,50,"Geist"); g.fillText(label,70,y);
   y+=44; g.fillStyle="#8A96B3"; g.font=F(400,28); g.fillText(`${pf(main.pct)} das seções apuradas · dados do TSE às ${main.hora?main.hora.slice(0,5):hhmm(Date.now())}`,70,y);
   // fotos lado a lado
@@ -1803,7 +1895,7 @@ function sideHTML(c,main,colors,est,uf,right){
   const won=S.wonN!=null?(S.wonN===c.n?" won":" lost"):"";
   return `<div class="side ${right?"r":""} ${lead?"lead":""}${won}" style="--c:${col}">
     <div class="pic">${foto(c,est,uf,col)}</div>
-    <div><div class="nm">${esc(shortName(c.nm))}</div><div class="pt">${esc(c.party)} · ${esc(c.n)}${tagHTML(c)}</div>
+    <div>${unum(c.n)}<div class="nm">${esc(shortName(c.nm))}</div><div class="pt">${esc(c.party)}${tagHTML(c)}</div>
     <div class="num">${tw("pc"+c.n,c.pct,"pn")}<i>%</i></div><div class="vt">${tw("vt"+c.n,c.votes,"n")} votos</div></div></div>`;
 }
 /* barra do placar: as duas partes somam sempre 100% (fatia de cada um entre os dois), e o traço marca a metade */
@@ -1821,7 +1913,7 @@ function boardHTML(main,colors,est,uf,label,decMain,decLabel){
   return `<section class="board">
     ${sideHTML(a,main,colors,est,uf,false)}
     <div class="mid"><div class="lbl">${esc(label)}</div>
-      <div class="apu"><b>${tw("apu",main.pct,"p")}</b>das seções apuradas · ${nf(main.st)} de ${nf(main.ts)}</div>
+      <div class="apu"><b>${tw("apu",main.pct,"p")}</b>das seções apuradas (${nf(main.st)} de ${nf(main.ts)})</div>
       ${tugHTML(a?.pct,b?.pct,colors[a?.n],colors[b?.n])}
       ${main.val&&sec?`<div class="gapline"><b>${esc(shortName(lead.nm))}</b> está ${nf(lead.votes-sec.votes)} votos à frente (${pp(lead.pct-sec.pct)}).</div>`:""}
       ${decHTML(decMain||main,decLabel)}
@@ -1879,7 +1971,7 @@ function fillFor(main,colors,mode,A,B){
   if(mode==="win"){ const t=main.cands.length<=2?clamp((top.pct-50)/15,0,1):clamp((top.pct-25)/40,0,1); return mix(PANEL,colors[top.n]||"#888",.62+.38*t); }
   if(mode==="adv"){ const a=main.cands.find(c=>c.n===A)?.pct||0, b=main.cands.find(c=>c.n===B)?.pct||0, d=a-b;
     return mix(PANEL,d>=0?colors[A]:colors[B],.32+.68*clamp(Math.abs(d)/25,0,1)); }
-  if(mode==="apu") return mix(PANEL,"#D4F25B",.18+.82*(main.pct/100));
+  if(mode==="apu") return mix(PANEL,"#F08A24",.18+.82*(main.pct/100));
   if(mode==="abs") return main.pabst==null?NODATA:mix(PANEL,"#B98CFF",.2+.8*clamp((main.pabst-12)/20,0,1));
   return NODATA;
 }
@@ -1950,7 +2042,7 @@ function worldMapSVG(W,H,byIso,colors){
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa-múndi por país">${g}<path class="hov" d="" fill="none"/></svg>`;
 }
 function legendHTML(mode,colors,cands){
-  if(mode==="apu") return `<div class="legend">0%<span class="ramp" style="background:linear-gradient(90deg,${mix(PANEL,"#D4F25B",.1)},#D4F25B)"></span>100% apurado</div>`;
+  if(mode==="apu") return `<div class="legend">0%<span class="ramp" style="background:linear-gradient(90deg,${mix(PANEL,"#F08A24",.1)},#F08A24)"></span>100% apurado</div>`;
   if(mode==="abs") return `<div class="legend">12%<span class="ramp" style="background:linear-gradient(90deg,${mix(PANEL,"#b98cff",.12)},#b98cff)"></span>32%+ de abstenção</div>`;
   const items=cands.slice(0,S.turno===2?2:5).map(c=>`<span><i style="background:${colors[c.n]}"></i>${esc(shortName(c.nm))}</span>`).join("");
   return `<div class="legend">${items}<span><i style="background:${NODATA}"></i>sem votos</span></div>
@@ -2272,7 +2364,7 @@ function waitHTML(){
   loadPre();
   const p=PRE.pres, fin=p?p.cands.filter(c=>statusOf(c)?.k==="t2").slice(0,2):[];
   const fc=p?colorMap(p.cands):{};
-  const duel = fin.length===2 ? `<div class="pre-duel">${fin.sort((a,b)=>(+a.n||0)-(+b.n||0)).map(c=>`<div class="pre-c" style="--c:${fc[c.n]}"><div class="pic">${foto(c,false,"br",fc[c.n])}</div><div><div class="nm">${esc(shortName(c.nm))}</div><div class="k">${esc(c.party)} · ${esc(c.n)}</div><div class="pc">${pf(c.pct)}</div><div class="k">${nf(c.votes)} votos no 1º turno</div></div></div>`).join('<div class="vs">×</div>')}</div>` : "";
+  const duel = fin.length===2 ? `<div class="pre-duel">${fin.sort((a,b)=>(+a.n||0)-(+b.n||0)).map(c=>`<div class="pre-c" style="--c:${fc[c.n]}"><div class="pic">${foto(c,false,"br",fc[c.n])}</div><div>${unum(c.n)}<div class="nm">${esc(shortName(c.nm))}</div><div class="k">${esc(c.party)}</div><div class="pc">${pf(c.pct)}</div><div class="k">${nf(c.votes)} votos no 1º turno</div></div></div>`).join('<div class="vs">×</div>')}</div>` : "";
   const races=govRaces();
   const rows = races ? races.map(u=>{ const f=govFinalists(T1G.data[u]); const col=colorMap(T1G.data[u].cands);
     return `<div class="pre-r" data-gogov="${u}" role="button" tabindex="0"><b>${UFNAME[u]} <span class="k" style="float:right">ver →</span></b>${f.map(c=>`<span><i style="background:${col[c.n]}"></i>${esc(shortName(c.nm))} <span class="k">${esc(c.party)} · ${pf(c.pct)}</span></span>`).join("")}</div>`; }).join("") : `<div class="k">Carregando o 1º turno…</div>`;
@@ -2356,7 +2448,7 @@ function presPage(){
   return `${miss}
   ${citySearchHTML()}
   ${sc==="BR"?headHTML(view,[...UFS,"zz"].map(u=>P.ufs[u]),colors,S.turno):""}
-  ${boardHTML(view,colors,false,"br",sc==="BR"?(S.src==="soma"?"Presidente · Brasil · soma dos estados (conta desta página)":"Presidente · Brasil · total do TSE"):"Presidente · "+title,br,"presidente")}
+  ${boardHTML(view,colors,false,"br",sc==="BR"?(S.src==="soma"?"Presidente no Brasil, pela soma dos estados":"Presidente no Brasil, total do TSE"):"Presidente, "+title,br,"presidente")}
   ${sc==="BR"?mathHTML(view,[...UFS,"zz"].map(u=>P.ufs[u]),colors,S.turno,"pres"):""}
   ${sc==="BR"?pmHTML():""}
   <div class="main">
@@ -2764,7 +2856,7 @@ function polTip(u){
 function render(){
   document.querySelectorAll("#turnoSeg button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.t===S.turno));
   document.querySelectorAll("#cargoSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.c===S.cargo));
-  $("#turnoLbl").textContent = S.turno===2?"2º turno · 25 de outubro":"1º turno · 4 de outubro";
+  $("#turnoLbl").textContent = S.turno===2?"2º turno, 25 de outubro":"1º turno, 4 de outubro";
   const app=$("#app"), T=D(), P=T.pres;
   const live=$("#live"); live.classList.toggle("off", !(P.br && P.br.val>0 && P.br.pct<100));
   let html="";
@@ -2944,7 +3036,7 @@ document.addEventListener("click",e=>{
   if(t.id==="cd"){ refresh(); return; }
   if(t.id==="bell"){ toggleAlertPanel(); return; }
   if(t.hasAttribute("data-alclose")){ toggleAlertPanel(false); return; }
-  if(t.hasAttribute("data-altest")){ const A=S.alerts, was=A.on; A.on=true; alertFor(Object.keys(A.types).find(k=>A.types[k])||"win","Teste: assim aparece um alerta da apuração.","#D4F25B"); A.on=was; return; }
+  if(t.hasAttribute("data-altest")){ const A=S.alerts, was=A.on; A.on=true; alertFor(Object.keys(A.types).find(k=>A.types[k])||"win","Teste: assim aparece um alerta da apuração.","#F08A24"); A.on=was; return; }
   if(t.dataset.city!=null){ const [uf,cd,zone]=t.dataset.city.split("|"); const c=CIDX.list.find(x=>x.uf===uf&&x.cd===cd); S.city={...c,zone:zone||null}; store.set("ap26_city",S.city); const q=$("#cityQ"); if(q) q.blur(); CITYD.cur=null; CITYD.loading=true; render(); fetchCity().then(()=>{ render(); document.querySelector(".citycard")?.scrollIntoView({behavior:"smooth",block:"nearest"}); }); return; }
   if(t.hasAttribute("data-cityclose")){ S.city=null; store.set("ap26_city",null); render(); return; }
   if(t.hasAttribute("data-ttplay")){ ttPlay(); return; }
@@ -2985,10 +3077,10 @@ document.addEventListener("change",e=>{ const sel=e.target.closest("[data-spec]"
   S.specOpen=true; const y=window.scrollY; render(); window.scrollTo(0,y); });
 document.addEventListener("focusout",e=>{ if(S.pending && e.target.matches?.("select,input")) setTimeout(()=>{ if(S.pending && !document.activeElement?.matches?.("select,input[type=range]")){ S.pending=false; const y=window.scrollY; render(); window.scrollTo(0,y); } },250); });
 document.addEventListener("change",e=>{ if(e.target.matches?.("[data-munuf]")){ MUN.uf=e.target.value||null; e.target.blur(); render(); } });
-$("#ivl").addEventListener("change",e=>{ S.ivl=+e.target.value; S.next=Date.now()+S.ivl*1000; });
+document.addEventListener("change",e=>{ if(e.target.id==="ivl"){ S.ivl=+e.target.value; S.next=Date.now()+S.ivl*1000; } });
 setInterval(()=>{
   const left=(S.next-Date.now())/1000;
-  $("#cd span").textContent=mmss(left);
+  $("#cd b").textContent=Math.max(0,Math.ceil(left))+" s"; const ub=$("#cd .upd-bar"); if(ub) ub.style.transform=`scaleX(${clamp(left/S.ivl,0,1)})`;
   const nx=$("#nx"); if(nx) nx.textContent=mmss(left);
   const rc=$("#ringc"); if(rc){ const c=2*Math.PI*9; rc.setAttribute("stroke-dashoffset",c*(left/S.ivl)); }
   if(left<=0 && !S.loading) refresh();
@@ -3095,7 +3187,7 @@ function updateFavicon(d){
   const c=document.createElement("canvas"); c.width=c.height=64; const g=c.getContext("2d");
   g.fillStyle="#05080F"; g.beginPath(); if(g.roundRect) g.roundRect(0,0,64,64,14); else g.rect(0,0,64,64); g.fill();
   g.lineWidth=6; g.strokeStyle="#1A2540"; g.beginPath(); g.arc(32,32,24,0,Math.PI*2); g.stroke();
-  g.strokeStyle="#D4F25B"; g.beginPath(); g.arc(32,32,24,-Math.PI/2,-Math.PI/2+Math.PI*2*clamp(d.pct/100,0,1)); g.stroke();
+  g.strokeStyle="#F08A24"; g.beginPath(); g.arc(32,32,24,-Math.PI/2,-Math.PI/2+Math.PI*2*clamp(d.pct/100,0,1)); g.stroke();
   const t=(d.a.pct+d.b.pct)||1, wa=32*d.a.pct/t; g.save(); g.beginPath(); g.arc(32,32,16,0,Math.PI*2); g.clip();
   g.fillStyle=d.ca; g.fillRect(16,16,wa,32); g.fillStyle=d.cb; g.fillRect(16+wa,16,32-wa,32); g.restore();
   const l=document.querySelector('link[rel="icon"]'); if(l) l.href=c.toDataURL("image/png");
@@ -3111,7 +3203,7 @@ function updateMiniBoard(){
   const [A,B]=sides.map(it), apu=+(board.querySelector(".mid .apu .tw")?.dataset.v)||0, two=A.pc+B.pc>=99.5, tt=(A.pc+B.pc)||1;
   const wa=two?A.pc/tt*100:A.pc, wb=two?100-wa:B.pc, live=!$("#live")?.classList.contains("off"), C=2*Math.PI*7;
   const ph=x=>x.img?`<img src="${esc(x.img)}" alt="" style="border-color:${x.c}">`:"";
-  mb.innerHTML=`${live?`<span class="mlive">Ao vivo</span>`:""}<span class="mc">${ph(A)}<span class="msn">${esc(lastName(A.nm))}</span><b style="background:${A.c}">${pct1(A.pc)}</b></span><span class="mbar"><i style="width:${wa}%;background:${A.c}"></i><i style="flex:1"></i><i style="width:${wb}%;background:${B.c}"></i></span><span class="mc"><b style="background:${B.c}">${pct1(B.pc)}</b><span class="msn">${esc(lastName(B.nm))}</span>${ph(B)}</span><span class="mapu"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#233050" stroke-width="2.5"/><circle cx="9" cy="9" r="7" fill="none" stroke="#D4F25B" stroke-width="2.5" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-clamp(apu/100,0,1))}" transform="rotate(-90 9 9)"/></svg>${apu1(apu)}%</span>`;
+  mb.innerHTML=`${live?`<span class="mlive">Ao vivo</span>`:""}<span class="mc">${ph(A)}<span class="msn">${esc(lastName(A.nm))}</span><b style="background:${A.c}">${pct1(A.pc)}</b></span><span class="mbar"><i style="width:${wa}%;background:${A.c}"></i><i style="flex:1"></i><i style="width:${wb}%;background:${B.c}"></i></span><span class="mc"><b style="background:${B.c}">${pct1(B.pc)}</b><span class="msn">${esc(lastName(B.nm))}</span>${ph(B)}</span><span class="mapu"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#233050" stroke-width="2.5"/><circle cx="9" cy="9" r="7" fill="none" stroke="#F08A24" stroke-width="2.5" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-clamp(apu/100,0,1))}" transform="rotate(-90 9 9)"/></svg>${apu1(apu)}%</span>`;
   mb.setAttribute("aria-label",`${A.nm} ${pct1(A.pc)}%, ${B.nm} ${pct1(B.pc)}%, ${apu1(apu)}% apurado. Voltar ao placar`);
   SBIO=new IntersectionObserver(([e])=>top.classList.toggle("sb",!e.isIntersecting&&e.boundingClientRect.top<0),{rootMargin:`-${top.offsetHeight}px 0px 0px 0px`});
   SBIO.observe(board);
