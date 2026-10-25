@@ -913,6 +913,10 @@ body.tv .headline{display:block!important;font-size:clamp(20px,1.8vw,28px);max-w
 .pmbar i+i{margin-left:auto}
 #pmChart{width:100%}
 .pmnote{margin-top:6px;font-size:12px}
+.bu{margin-top:16px}
+.bu-r{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.bu-v{display:flex;gap:16px;flex-wrap:wrap}
+.bu-v i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
 /* ---------- ajuda de atalhos ---------- */
 .kgrid{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:16px 0 4px;font-size:14px}
 kbd{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:7px;background:var(--panel3);font:600 12.5px var(--sans);color:var(--text)}
@@ -2350,6 +2354,27 @@ function drawPM(){
 
 /* ============ RENDER: PÁGINAS ============ */
 const PRE={pres:null,loading:false};
+/* exterior antes das 17h: o TSE só publica às 17h, mas os boletins de urna da Ásia e da Oceania saem de madrugada.
+   exterior-bu.json é atualizado à mão com o que a imprensa soma dos boletins (votos por país, chave = número do candidato). */
+const BU={data:null,t:0,loading:false};
+function buLoad(){ if(BU.loading||Date.now()-BU.t<60000) return; BU.loading=true;
+  fetch("exterior-bu.json?_="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ BU.data=j&&Array.isArray(j.paises)?j:null; })
+    .catch(()=>{}).finally(()=>{ BU.loading=false; BU.t=Date.now(); render(); }); }
+function buHTML(){
+  buLoad(); const d=BU.data, p=PRE.pres; if(!d||!d.paises.length||!p) return "";
+  const fin=p.cands.filter(c=>statusOf(c)?.k==="t2").slice(0,2); if(fin.length<2) return "";
+  const fc=colorMap(p.cands), tot=n=>d.paises.reduce((t,x)=>t+(+x.votos?.[n]||0),0);
+  const cs=fin.map(c=>({c,v:tot(c.n)})), val=cs.reduce((t,x)=>t+x.v,0); if(!val) return "";
+  cs.sort((a,b)=>b.v-a.v);
+  const rows=d.paises.map(x=>{ const v=fin.map(c=>+x.votos?.[c.n]||0), s=v[0]+v[1]; return {x,v,s}; }).filter(r=>r.s).sort((a,b)=>b.s-a.s)
+    .map(r=>`<div class="bu-r"><b>${esc(r.x.pais)}</b>${r.x.completo?"":` <span class="k">parcial</span>`}<span class="bu-v">${fin.map((c,i)=>`<span><i style="background:${fc[c.n]}"></i>${esc(shortName(c.nm))} ${pf(r.v[i]/r.s*100,1)} <span class="k">(${nf(r.v[i])})</span></span>`).join("")}</span></div>`).join("");
+  const at=d.atualizado?new Date(d.atualizado):null;
+  return `<div class="card bu"><h3 style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">Exterior antes das 17h <small>boletins de urna · não é a apuração oficial</small></h3>
+    <div class="pmrow">${cs.map(o=>`<div class="pmc" style="--c:${fc[o.c.n]}"><span class="k">${esc(shortName(o.c.nm))}</span><b>${pf(o.v/val*100,1)}</b><span class="k">${nf(o.v)} votos</span></div>`).join("")}</div>
+    <div class="pmbar">${cs.map(o=>`<i style="width:${(o.v/val*100).toFixed(1)}%;background:${fc[o.c.n]}"></i>`).join("")}</div>
+    ${rows}
+    <div class="k pmnote">Soma dos boletins de urna afixados nas seções de ${d.paises.length===1?"1 país":d.paises.length+" países"} onde a votação já terminou${d.fonte?" ("+esc(d.fonte)+")":""}.${at&&!isNaN(at)?" Atualizado às "+hhmm(at.getTime())+".":""} Votos válidos. Às 17h entram os dados oficiais do TSE.</div></div>`;
+}
 function loadPre(){ if(PRE.pres||PRE.loading) return; PRE.loading=true;
   Promise.all([getJSON(U.uf(S.eles[1].fed,"br","0001")).then(parseTSE).catch(()=>null), loadT1Gov().catch(()=>null)]).then(([p])=>{ PRE.pres=p; PRE.loading=false; if(S.turno===2) render(); }); }
 function cdnParts(){ const ms=Math.max(0,ELEC_DAY2-Date.now()); return {d:Math.floor(ms/864e5),h:Math.floor(ms%864e5/36e5),m:Math.floor(ms%36e5/6e4),s:Math.floor(ms%6e4/1e3)}; }
@@ -2377,7 +2402,7 @@ function waitHTML(){
       <div style="margin-top:auto;padding-top:20px"><button class="btn" data-turno="1">Ver o painel com o 1º turno</button><button class="x lnk" data-ics>Lembrete na agenda</button></div></div>
     <div class="w-r"><div class="w-mh"><b>Como cada estado votou em 4 de outubro</b><span class="k">entre os dois finalistas</span></div><div id="mapBox" data-map="t1"></div><div class="legend">${leg}</div></div>
   </div>
-  ${pmHTML()}${munCardHTML()}
+  ${buHTML()}${pmHTML()}${munCardHTML()}
   <h3 class="pre-h">Governador · ${races?races.length:"…"} disputas no 2º turno</h3><div class="pre-grid">${rows}</div>`;
 }
 function checkHTML(br,soma,colors){
