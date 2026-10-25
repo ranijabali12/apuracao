@@ -2393,14 +2393,17 @@ async function fetchBUTSE(){
         X.cfg.push({k:`${m.cd}-${z.cd}-${sc.ns}`,m:m.cd,nm:m.nm,z:z.cd,s:sc.ns}); })))); }
     /* boletim recebido não muda; a cada rodada confere até 500 seções ainda sem boletim, em rodízio */
     const pend=X.cfg.filter(c=>!X.secs[c.k]); if(!pend.length) return;
-    const start=X.cur%pend.length, batch=pend.slice(start,start+500).concat(pend.slice(0,Math.max(0,start+500-pend.length)));
+    const n=X.swept?500:pend.length; /* a primeira rodada confere tudo de uma vez */
+    const start=X.cur%pend.length, batch=pend.slice(start,start+n).concat(pend.slice(0,Math.max(0,start+n-pend.length)));
     X.cur=start+batch.length;
-    await pool(batch,12,async c=>{ const dir=`${root}/dados/zz/${c.m}/${c.z}/${c.s}/`;
+    let shown=0;
+    await pool(batch,X.swept?12:24,async c=>{ const dir=`${root}/dados/zz/${c.m}/${c.z}/${c.s}/`;
       const a=await getJSON(`${dir}p${pad6(BU_PL)}-zz-m${c.m}-z${c.z}-s${c.s}-aux.json`);
       const h=(a.hashes||[]).find(h=>/receb|totaliz/i.test(h.st||"")&&(h.arq||[]).some(f=>f.tp==="bu")); if(!h) return;
       const r=await fetch(dir+h.hash+"/"+h.arq.find(f=>f.tp==="bu").nm); if(!r.ok) return;
-      const v=buVotes(new Uint8Array(await r.arrayBuffer())); if(v) X.secs[c.k]={...c,...v}; });
-  } finally { X.busy=false; X.t=Date.now(); }
+      const v=buVotes(new Uint8Array(await r.arrayBuffer())); if(v){ X.secs[c.k]={...c,...v}; if(++shown%10===1){ X.t=Date.now(); render(); } } });
+    X.swept=true;
+  } finally { X.busy=false; X.t=Date.now(); render(); }
 }
 /* países: boletins do TSE quando já há algum; senão o arquivo manual */
 function buPaises(){
