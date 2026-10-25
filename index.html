@@ -1984,7 +1984,7 @@ function fillFor(main,colors,mode,A,B){
   if(mode==="abs") return main.pabst==null?NODATA:mix(PANEL,"#B98CFF",.2+.8*clamp((main.pabst-12)/20,0,1));
   return NODATA;
 }
-/* cada estado é um grupo: fundo apagado + "nível" que enche de baixo para cima até o % apurado */
+/* cada estado é um grupo pintado com uma cor só (a do líder); o nível por % apurado ficou desligado: lia-se como duas cores no mesmo estado */
 /* cada mapa ganha um prefixo próprio nos recortes: com dois mapas na página (principal e "Voltar no tempo"),
    ids iguais faziam um mapa usar o recorte do outro e o nível aparecia em pedaços fora do lugar */
 let MAPN=0; const HOVP=`<path class="hov" d="" fill="none"/>`;
@@ -2233,23 +2233,36 @@ function mathHTML(main,units,colors,turno,cargo){
    - 2º turno ao vivo: o navegador busca os municípios do estado escolhido no TSE (um arquivo por município)
    Desenhado em canvas: 5.570 polígonos em SVG travariam a página. O mouse acha o município por um segundo canvas
    escondido em que cada município tem uma cor única. */
-const MUN={geo:{},t1:null,cfg:{},live:{},liveT:{},loading:{},uf:null,src:null,key:"",feats:[],busy:false};
+const MUN={geo:{},t1:null,cfg:{},live:{},liveT:{},liveTS:{},loading:{},uf:null,src:null,key:"",feats:[],busy:false};
 const munJSON=u=>fetch(u).then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); });
 async function munGeo(uf){ if(!MUN.geo[uf]) MUN.geo[uf]=munJSON(`mun/geo/${uf}.json`).then(j=>topojson.feature(j,Object.values(j.objects)[0]).features.map(f=>(f.uf=uf,f))); return MUN.geo[uf]; }
 async function munCfg(e){ if(!MUN.cfg[e]) MUN.cfg[e]=getJSON(U.cfg(e)).then(j=>{ const m={}; (j.abr||[]).forEach(a=>{ if(a.cd==="zz") return; (a.mu||[]).forEach(x=>m[x.cdi]={cd:x.cd,nm:x.nm,uf:String(a.cd).toLowerCase()}); }); return m; }); return MUN.cfg[e]; }
 function munT1(){ if(!MUN.t1) MUN.t1=munJSON("mun/t1.json"); return MUN.t1; }
-/* ao vivo: todos os municípios de um estado, de 10 em 10, no máximo a cada 2 minutos */
 /* contido de propósito: o TSE bloqueia por alguns minutos o IP que pede demais (HTTP 429), e esse bloqueio derrubaria
    também o placar. Por isso: 4 arquivos por vez, no máximo a cada 15 min, só com o mapa na tela, e 10 min de pausa no 429 */
+/* municípios ao vivo: seguem o mesmo ciclo do mapa do Brasil. A cada rodada, o estado cujo arquivo do TSE mudou
+   desde a última leitura tem os municípios relidos (só os que ainda não chegaram a 100%). O estado escolhido vem primeiro */
 async function munLive(uf){
   /* devolve true só quando trouxe dados novos: quem chama redesenha apenas nesse caso (senão vira um ciclo) */
-  if(MUN.loading[uf] || Date.now()<(MUN.pause||0) || (MUN.liveT[uf] && Date.now()-MUN.liveT[uf]<900000)) return false;
-  const box=$("#munBox"), r=box?.getBoundingClientRect(); if(!r||r.bottom<0||r.top>innerHeight||document.hidden) return false;
+  if(MUN.loading[uf] || Date.now()<(MUN.pause||0) || document.hidden) return false;
+  const d=D().pres.ufs[uf], ts=d?`${d.st}|${d.val}|${d.hora}`:"";
+  if(MUN.live[uf] && (MUN.liveTS[uf]===ts || Date.now()-MUN.liveT[uf]<MUN_MIN)) return false;
   MUN.loading[uf]=true; let hit429=false;
-  try{ const e=S.eles[2].fed, cfg=await munCfg(e), list=Object.entries(cfg).filter(([,x])=>x.uf===uf), m={...(MUN.live[uf]||{})};
-    await pool(list,4,async([cdi,x])=>{ if(hit429) return; try{ m[cdi]=parseTSE(await getJSON(U.mun(e,uf,x.cd,"0001"))); }catch(err){ if(err.status===429){ hit429=true; MUN.pause=Date.now()+600000; } } });
-    MUN.live[uf]=m; MUN.liveT[uf]=Date.now(); return true; }
+  try{ const e=S.eles[2].fed, cfg=await munCfg(e), m={...(MUN.live[uf]||{})};
+    const list=Object.entries(cfg).filter(([cdi,x])=>x.uf===uf && !(m[cdi]?.pct>=100));
+    await pool(list,6,async([cdi,x])=>{ if(hit429) return; try{ m[cdi]=parseTSE(await getJSON(U.mun(e,uf,x.cd,"0001"))); }catch(err){ if(err.status===429){ hit429=true; MUN.pause=Date.now()+120000; } } });
+    MUN.live[uf]=m; MUN.liveT[uf]=Date.now(); if(!hit429) MUN.liveTS[uf]=ts; return true; }
   catch(e){ return false; } finally{ MUN.loading[uf]=false; }
+}
+const MUN_MIN=25000;
+let MUNRD=0;
+function munRedraw(){ clearTimeout(MUNRD); MUNRD=setTimeout(()=>drawMun(true),400); }
+async function munSync(){
+  if(MUN.syncing || S.turno!==2 || munSrc()!=="live" || !$("#munBox")) return; MUN.syncing=true;
+  const sel=MUN.uf;
+  try{ const order=sel?[sel]:[...UFS].sort((a,b)=>(MUN.live[a]?1:0)-(MUN.live[b]?1:0));
+    for(const u of order){ if(MUN.uf!==sel) break; if(await munLive(u)) munRedraw(); if(Date.now()<(MUN.pause||0)) break; } }
+  finally{ MUN.syncing=false; if(MUN.uf!==sel) munRedraw(); }
 }
 function munSrc(){ const P=D().pres; return S.turno===2 && (MUN.src==="live" || (MUN.src==null && P.br?.val)) ? "live" : "t1"; }
 /* cor do município: quem venceu, mais forte quanto maior a vantagem (mesma escala do mapa por estado) */
@@ -2274,10 +2287,11 @@ function munCardHTML(){
 async function drawMun(force){
   const box=$("#munBox"); if(!box||MUN.busy&&!force) return;
   const src=munSrc(), uf=MUN.uf, W=Math.max(280,box.clientWidth);
-  if(src==="live"&&uf) munLive(uf).then(ok=>{ if(ok) drawMun(true); });
+  if(src==="live") munSync();
   const P=D().pres, base=P.br?.cands?.length?P.br.cands:PRE.pres?.cands||[], colors=colorMap(base);
   const stamp=[src,uf||"br",W,src==="live"?Object.values(MUN.liveT).join(","):"t1",base.map(c=>c.n).join(".")].join("|");
-  if(!force&&stamp===MUN.key&&box.querySelector("canvas")) return;
+  /* o render refaz o cartão e apaga a legenda; o canvas fica (é "owned"), então só a legenda precisa voltar */
+  if(!force&&stamp===MUN.key&&box.querySelector("canvas")){ const lg=$("#munLeg"); if(lg&&MUN.leg&&!lg.innerHTML) lg.innerHTML=MUN.leg; return; }
   MUN.busy=true;
   try{
     const ufs=uf?[uf]:UFS, [geos,t1,names]=await Promise.all([Promise.all(ufs.map(munGeo)),src==="t1"?munT1():null,munCfg(S.eles[1].fed).catch(()=>({}))]); MUN.names=names;
@@ -2299,8 +2313,8 @@ async function drawMun(force){
     MUN.feats=feats; MUN.rows=rows; MUN.hitCtx=h; MUN.dpr=dpr; MUN.proj=proj; MUN.key=stamp; MUN.colors=colors; MUN.ov=ov;
     box.innerHTML=""; const wrap=document.createElement("div"); wrap.className="munwrap"; wrap.append(cv,ov); box.appendChild(wrap);
     ov.addEventListener("click",munClick);
-    $("#munLeg").innerHTML=(base.slice(0,2).map(c=>`<span><i style="background:${colors[c.n]}"></i>${esc(shortName(c.nm))} venceu</span>`).join(""))+
-      (src==="live"?(uf?`<span>${MUN.loading[uf]&&!MUN.live[uf]?"Buscando os municípios no TSE…":`atualizado às ${MUN.liveT[uf]?hhmm(MUN.liveT[uf]):"—"} · a cada 15 min`}</span>`:`<span>Escolha um estado para ver os municípios ao vivo</span>`):"")+
+    $("#munLeg").innerHTML=MUN.leg=(base.slice(0,2).map(c=>`<span><i style="background:${colors[c.n]}"></i>${esc(shortName(c.nm))} venceu</span>`).join(""))+
+      (src==="live"?(uf?`<span>${MUN.loading[uf]&&!MUN.live[uf]?"Buscando os municípios no TSE…":`atualizado às ${MUN.liveT[uf]?hhmm(MUN.liveT[uf]):"—"} · atualiza junto com o mapa`}</span>`:`<span>${(n=>n<UFS.length?`Carregando municípios: ${n} de ${UFS.length} estados`:`atualiza junto com o mapa`)(UFS.filter(u=>MUN.live[u]).length)}</span>`):"")+
       `<span>cor mais forte = vitória mais folgada</span>`;
   }catch(e){ box.innerHTML=`<div class="chempty">Não consegui carregar o mapa dos municípios agora.</div>`; }
   finally{ MUN.busy=false; }
@@ -2317,7 +2331,7 @@ function munHover(e){
 function munTipHTML(i){
   const f=MUN.feats[i], r=MUN.rows[i], nm=MUN.names?.[f.properties.codarea]?.nm||"Município";
   const names={}; [...(D().pres.br?.cands||[]),...(PRE.pres?.cands||[])].forEach(c=>names[c.n]=shortName(c.nm));
-  if(!r) return `<b class="h">${esc(titleCase(nm))} · ${f.uf.toUpperCase()}</b><div class="k">${munSrc()==="live"&&!MUN.live[f.uf]?"Escolha o estado para carregar":"Sem votos apurados"}</div>`;
+  if(!r) return `<b class="h">${esc(titleCase(nm))} · ${f.uf.toUpperCase()}</b><div class="k">${munSrc()==="live"&&!MUN.live[f.uf]?"Carregando os municípios…":"Sem votos apurados"}</div>`;
   return `<b class="h">${esc(titleCase(nm))} · ${f.uf.toUpperCase()}</b><div class="k">${pf(r.pct)} apurado · ${nf(r.val)} votos válidos</div>`+r.cands.slice(0,3).map(c=>`<div class="r"><span><span style="color:${MUN.colors[c.n]||"#888"}">●</span> ${esc(names[c.n]||c.n)}</span><b>${pf(c.pct)}</b></div>`).join("");
 }
 function munClick(e){ const i=munAt(e); if(i<0||MUN.uf) return; MUN.uf=MUN.feats[i].uf; render(); }
@@ -3070,7 +3084,7 @@ function drawMap(){
     if(!GEO.br && !GEO.brTried) loadBR();
     const br=P.br, colors=colorMap(br.cands), A=br.cands[0]?.n, B=br.cands[1]?.n;
     const focus = S.scope==="BR"?null:REG[S.scope];
-    box.innerHTML=brMapSVG(W,H,u=>fillFor(P.ufs[u],colors,S.mode,A,B),focus,S.detail,u=>u.toUpperCase(),"",(S.mode==="win"||S.mode==="adv")?(u=>P.ufs[u]?.val?P.ufs[u].pct/100:null):null);
+    box.innerHTML=brMapSVG(W,H,u=>fillFor(P.ufs[u],colors,S.mode,A,B),focus,S.detail,u=>u.toUpperCase(),"");
     introMap(box,"br"+S.turno+S.scope); swapMap(box,"br"+S.turno+S.mode+S.src); animateLevels(box,"br"+S.turno+S.mode);
     $("#legend").innerHTML=legendHTML(S.mode,colors,br.cands);
   } else if(kind==="world"){
@@ -3083,7 +3097,7 @@ function drawMap(){
     if(!GEO.br && !GEO.brTried) loadBR();
     const G=D().gov, m=S.mode==="apu"?"apu":"win"; let defs="";
     const fills={}; UFS.forEach(u=>fills[u]=govFill(u,m,d=>defs+=d));
-    box.innerHTML=brMapSVG(W,H,u=>fills[u],null,S.gsel,u=>u.toUpperCase(),defs,m==="win"?(u=>G.ufs[u]?.val?G.ufs[u].pct/100:null):null);
+    box.innerHTML=brMapSVG(W,H,u=>fills[u],null,S.gsel,u=>u.toUpperCase(),defs);
     introMap(box,"gov"+S.turno); swapMap(box,"gov"+S.turno+m); animateLevels(box,"gov"+S.turno);
   } else if(kind==="t1"){
     if(!GEO.br && !GEO.brTried) loadBR();
