@@ -1575,6 +1575,7 @@ async function refresh(){
   try{
     const jobs=[fetchPres().catch(e=>{ S.err=e; }), fetchGov().catch(()=>{})];
     if(S.turno===2) jobs.push(fetchServer().catch(()=>{}));
+    if(S.turno===2 && (D().pres.waiting || !D().pres.br?.val)) jobs.push(fetchBUTSE().catch(()=>{}));
     if(S.cargo==="pres" && S.scope==="ZZ") jobs.push(fetchExt().catch(()=>{}));
     if(S.cargo==="pol" && S.polKind==="gov") jobs.push(polGov2().catch(()=>{}));
     if(S.city && S.cargo==="pres") jobs.push(fetchCity().catch(()=>{}));
@@ -2354,26 +2355,78 @@ function drawPM(){
 
 /* ============ RENDER: PÁGINAS ============ */
 const PRE={pres:null,loading:false};
-/* exterior antes das 17h: o TSE só publica às 17h, mas os boletins de urna da Ásia e da Oceania saem de madrugada.
-   exterior-bu.json é atualizado à mão com o que a imprensa soma dos boletins (votos por país, chave = número do candidato). */
-const BU={data:null,t:0,loading:false};
+/* exterior antes das 17h: a apuração oficial só sai às 17h, mas o TSE já publica o boletim de urna (bu.dat) de cada seção do
+   exterior assim que ela transmite. O painel lê esses boletins direto do TSE e soma por país; exterior-bu.json fica de reserva. */
+const BU_PL = "3221"; /* pleito do 2º turno de 2026 em arquivo-urna (comum/config/ele-c.json) */
+const BU={data:null,t:0,loading:false,tse:{cfg:null,secs:{},cur:0,busy:false,t:0}};
 function buLoad(){ if(BU.loading||Date.now()-BU.t<60000) return; BU.loading=true;
   fetch("exterior-bu.json?_="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ BU.data=j&&Array.isArray(j.paises)?j:null; })
     .catch(()=>{}).finally(()=>{ BU.loading=false; BU.t=Date.now(); render(); }); }
+/* DER (ASN.1) mínimo: devolve os nós de b[s..e) */
+function derNodes(b,s,e){ const out=[]; let i=s;
+  while(i<e){ const t=b[i++]; let tag=t&31; if(tag===31){ tag=0; let x; do{ x=b[i++]; tag=tag*128+(x&127); }while(x&128); }
+    let len=b[i++]; if(len===undefined) throw 0; if(len&128){ const n=len&127; if(!n||n>4) throw 0; len=0; for(let k=0;k<n;k++) len=len*256+b[i++]; }
+    if(i+len>e) throw 0; out.push({con:!!(t&32),tag,s:i,e:i+len}); i+=len; }
+  return out; }
+const derInt=(b,n)=>{ let v=0; for(let i=n.s;i<n.e;i++) v=v*256+b[i]; return v; };
+/* acha os TotalVotosVotavel {tipoVoto [0], quantidadeVotos [1], identificacaoVotavel [2] {partido [0], codigo [1]}}.
+   O boletim vem dentro de um envelope (OCTET STRING), então conteúdo primitivo longo também é aberto. */
+function buVotes(b){
+  const r={v:{},br:0,nu:0}; let found=false;
+  const kids=n=>{ if(n.con) return derNodes(b,n.s,n.e); if(n.e-n.s<24) return null; try{ const k=derNodes(b,n.s,n.e); return k.length&&k[0].con?k:null; }catch(e){ return null; } };
+  const walk=(n,d)=>{ if(d>14) return; let k; try{ k=kids(n); }catch(e){ return; } if(!k) return;
+    const t0=k.find(x=>!x.con&&x.tag===0), t1=k.find(x=>!x.con&&x.tag===1), t2=k.find(x=>x.con&&x.tag===2);
+    if(n.con&&t0&&t1&&k.length<=4&&t0.e-t0.s===1&&t1.e-t1.s<=4){ const tipo=derInt(b,t0), q=derInt(b,t1);
+      if(tipo===1&&t2){ let id; try{ id=derNodes(b,t2.s,t2.e); }catch(e){} const c=id?.find(x=>!x.con&&x.tag===1); if(c){ const cd=String(derInt(b,c)); r.v[cd]=(r.v[cd]||0)+q; found=true; return; } }
+      if(tipo===3&&!t2){ r.br+=q; found=true; return; }
+      if(tipo===4&&!t2){ r.nu+=q; found=true; return; } }
+    k.forEach(x=>walk(x,d+1)); };
+  try{ derNodes(b,0,b.length).forEach(n=>walk(n,0)); }catch(e){ return null; }
+  return found?r:null; }
+async function fetchBUTSE(){
+  const X=BU.tse; if(X.busy) return; X.busy=true;
+  try{
+    const root=`${BASE}/arquivo-urna/${BU_PL}`;
+    if(!X.cfg){ const j=await getJSON(`${root}/config/zz/zz-p${pad6(BU_PL)}-cs.json`); X.cfg=[];
+      (j.abr||[]).forEach(a=>(a.mu||[]).forEach(m=>(m.zon||[]).forEach(z=>(z.sec||[]).forEach(sc=>{ if(sc.nsp) return; /* seção agregada: votos no boletim da principal */
+        X.cfg.push({k:`${m.cd}-${z.cd}-${sc.ns}`,m:m.cd,nm:m.nm,z:z.cd,s:sc.ns}); })))); }
+    /* boletim recebido não muda; a cada rodada confere até 500 seções ainda sem boletim, em rodízio */
+    const pend=X.cfg.filter(c=>!X.secs[c.k]); if(!pend.length) return;
+    const start=X.cur%pend.length, batch=pend.slice(start,start+500).concat(pend.slice(0,Math.max(0,start+500-pend.length)));
+    X.cur=start+batch.length;
+    await pool(batch,12,async c=>{ const dir=`${root}/dados/zz/${c.m}/${c.z}/${c.s}/`;
+      const a=await getJSON(`${dir}p${pad6(BU_PL)}-zz-m${c.m}-z${c.z}-s${c.s}-aux.json`);
+      const h=(a.hashes||[]).find(h=>/receb|totaliz/i.test(h.st||"")&&(h.arq||[]).some(f=>f.tp==="bu")); if(!h) return;
+      const r=await fetch(dir+h.hash+"/"+h.arq.find(f=>f.tp==="bu").nm); if(!r.ok) return;
+      const v=buVotes(new Uint8Array(await r.arrayBuffer())); if(v) X.secs[c.k]={...c,...v}; });
+  } finally { X.busy=false; X.t=Date.now(); }
+}
+/* países: boletins do TSE quando já há algum; senão o arquivo manual */
+function buPaises(){
+  const X=BU.tse, got=Object.values(X.secs);
+  if(got.length){ const by={};
+    X.cfg.forEach(c=>{ const co=countryOf(c.nm).name; (by[co] ||= {pais:co,votos:{},sec:0,tot:0}).tot++; });
+    got.forEach(c=>{ const o=by[countryOf(c.nm).name]; o.sec++; Object.entries(c.v).forEach(([n,q])=>o.votos[n]=(o.votos[n]||0)+q); });
+    return {tse:true,sec:got.length,tot:X.cfg.length,t:X.t,paises:Object.values(by).filter(o=>o.sec).map(o=>({...o,completo:o.sec===o.tot}))}; }
+  const d=BU.data; return d&&d.paises.length?{tse:false,paises:d.paises,fonte:d.fonte,at:d.atualizado}:null;
+}
 function buHTML(){
-  buLoad(); const d=BU.data, p=PRE.pres; if(!d||!d.paises.length||!p) return "";
+  buLoad(); const d=buPaises(), p=PRE.pres; if(!d||!p) return "";
   const fin=p.cands.filter(c=>statusOf(c)?.k==="t2").slice(0,2); if(fin.length<2) return "";
   const fc=colorMap(p.cands), tot=n=>d.paises.reduce((t,x)=>t+(+x.votos?.[n]||0),0);
   const cs=fin.map(c=>({c,v:tot(c.n)})), val=cs.reduce((t,x)=>t+x.v,0); if(!val) return "";
   cs.sort((a,b)=>b.v-a.v);
   const rows=d.paises.map(x=>{ const v=fin.map(c=>+x.votos?.[c.n]||0), s=v[0]+v[1]; return {x,v,s}; }).filter(r=>r.s).sort((a,b)=>b.s-a.s)
-    .map(r=>`<div class="bu-r"><b>${esc(r.x.pais)}</b>${r.x.completo?"":` <span class="k">parcial</span>`}<span class="bu-v">${fin.map((c,i)=>`<span><i style="background:${fc[c.n]}"></i>${esc(shortName(c.nm))} ${pf(r.v[i]/r.s*100,1)} <span class="k">(${nf(r.v[i])})</span></span>`).join("")}</span></div>`).join("");
-  const at=d.atualizado?new Date(d.atualizado):null;
+    .map(r=>`<div class="bu-r"><b>${esc(r.x.pais)}</b>${r.x.completo?"":` <span class="k">${r.x.tot?`${r.x.sec} de ${r.x.tot} seções`:"parcial"}</span>`}<span class="bu-v">${fin.map((c,i)=>`<span><i style="background:${fc[c.n]}"></i>${esc(shortName(c.nm))} ${pf(r.v[i]/r.s*100,1)} <span class="k">(${nf(r.v[i])})</span></span>`).join("")}</span></div>`).join("");
+  const np=d.paises.length, nps=np===1?"1 país":np+" países";
+  const note = d.tse
+    ? `Soma dos boletins de urna que o TSE já publicou: ${nf(d.sec)} de ${nf(d.tot)} seções do exterior, em ${nps}. Atualizado às ${hhmm(d.t)}.`
+    : (()=>{ const at=d.at?new Date(d.at):null; return `Soma dos boletins de urna de ${nps}${d.fonte?" ("+esc(d.fonte)+")":""}.${at&&!isNaN(at)?" Atualizado às "+hhmm(at.getTime())+".":""}`; })();
   return `<div class="card bu"><h3 style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">Exterior antes das 17h <small>boletins de urna · não é a apuração oficial</small></h3>
     <div class="pmrow">${cs.map(o=>`<div class="pmc" style="--c:${fc[o.c.n]}"><span class="k">${esc(shortName(o.c.nm))}</span><b>${pf(o.v/val*100,1)}</b><span class="k">${nf(o.v)} votos</span></div>`).join("")}</div>
     <div class="pmbar">${cs.map(o=>`<i style="width:${(o.v/val*100).toFixed(1)}%;background:${fc[o.c.n]}"></i>`).join("")}</div>
     ${rows}
-    <div class="k pmnote">Soma dos boletins de urna afixados nas seções de ${d.paises.length===1?"1 país":d.paises.length+" países"} onde a votação já terminou${d.fonte?" ("+esc(d.fonte)+")":""}.${at&&!isNaN(at)?" Atualizado às "+hhmm(at.getTime())+".":""} Votos válidos. Às 17h entram os dados oficiais do TSE.</div></div>`;
+    <div class="k pmnote">${note} Votos válidos. Às 17h entram os dados oficiais do TSE.</div></div>`;
 }
 function loadPre(){ if(PRE.pres||PRE.loading) return; PRE.loading=true;
   Promise.all([getJSON(U.uf(S.eles[1].fed,"br","0001")).then(parseTSE).catch(()=>null), loadT1Gov().catch(()=>null)]).then(([p])=>{ PRE.pres=p; PRE.loading=false; if(S.turno===2) render(); }); }
