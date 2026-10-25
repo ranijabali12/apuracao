@@ -2193,7 +2193,7 @@ function headHTML(main,units,colors,turno){
   let t=`Com <b>${pf(m.pct,m.pct<1?2:1)}</b> apurado, ${nm(m.L)} lidera por <b>${votos(diff)}</b>.`;
   if(d?.k==="win") t=`${nm(d.x)} está eleito${d.src==="conta"?" pela conta":""}, com ${pf(m.pct,1)} apurado.`;
   else if(d?.k==="t2") t+=` Já está definido o 2º turno entre ${nm(d.a)} e ${nm(d.b)}.`;
-  else if(m.mL>0&&m.mL<=m.R) t+=` Precisa de mais <b>${votos(m.mL)}</b> para ${m.two?"estar eleito":"vencer no 1º turno"} pela conta; nas simulações, ${m.two?"vence":"vence no 1º turno"} em <b>${chance(m.two?m.mc.pWin:m.mc.pOver)}</b> dos casos.`;
+  else if(m.mL>0&&m.mL<=m.R) t+=` Precisa de mais <b>${votos(m.mL)}</b> para ${m.two?"estar eleito":"vencer no 1º turno"} pela conta.`;
   return `<p class="headline" aria-live="polite">${t}</p>`;
 }
 function mathHTML(main,units,colors,turno,cargo){
@@ -2217,21 +2217,11 @@ function mathHTML(main,units,colors,turno,cargo){
     if(mg>m.R) return `<div class="mtile out" style="--c:${col}"><span class="k">${nm(c)}</span><b class="mbig">Sem chance de maioria</b><p>Nem com todos os votos que ainda podem entrar chega à metade.</p></div>`;
     return `<div class="mtile" style="--c:${col}"><span class="k">${nm(c)} precisa de mais</span><b class="mbig">${tw("mg"+c.n,mg,"n")}<small>votos</small></b><p>Se tiver mais ${nf(mg)} votos, ${goal}, aconteça o que acontecer com o resto. É ${pf(mg/m.R*100,1)} do máximo que ainda pode entrar.</p></div>`;
   };
-  const pW=m.two?m.mc.pWin:m.mc.pOver;
-  const viraTxt = m.needB==null?"" : m.needB>1 ? `<b>Pela estimativa, não dá mais.</b> ${nm(m.B)} precisaria de mais de 100% do que falta.`
-    : `${nm(m.B)} precisa de <b style="color:${cB}">${pf(m.needB*100,1)}</b> dos votos que faltam para passar ${nm(m.L)}. ${m.nSame?"Pela variação nas mesmas urnas, deve fazer":"Nos lugares onde ainda há voto, vem fazendo"} <b style="color:${cB}">${pf(m.doingB*100,1)}</b>.`;
-  return `<section class="card math"><h3>A matemática da noite <small>conta exata e estimativa, refeitas a cada atualização</small></h3>
+  return `<section class="card math"><h3>A matemática da noite <small>conta exata, refeita a cada atualização</small></h3>
     ${strip}
     <div class="mtiles">${tile(m.L,m.mL,cL)}${tile(m.B,m.mB,cB)}</div>
-    <div class="mstats">
-      <div class="mstat"><span class="k">${m.two?"Chance de vitória":"Chance de vencer no 1º turno"}</span><b>${nm(m.L)} <span style="color:${cL}">${chance(pW)}</span></b>
-        ${m.two?`<div class="mprob"><i style="width:${(pW*100).toFixed(1)}%;background:${cL}"></i><i style="flex:1;background:${cB}"></i></div><span class="k">${nm(m.B)} ${chance(1-pW)}</span>`:`<span class="k">Senão, vai ao 2º turno.</span>`}</div>
-      <div class="mstat"><span class="k">Resultado final projetado</span><b>${nm(m.L)} <span style="color:${cL}">${pf(m.mc.mid*100,1)}</span></b><span class="k">entre ${pf(m.mc.lo*100,1)} e ${pf(m.mc.hi*100,1)} em 9 de cada 10 simulações</span></div>
-      <div class="mstat"><span class="k">Para virar</span><p>${viraTxt}</p></div>
-    </div>
     <details class="mhow"><summary>Como essas contas são feitas</summary>
-      <p><b>Número mágico (conta exata).</b> Soma os votos válidos já apurados com o teto do que ainda pode entrar: todo eleitor das seções que faltam votando em alguém (mais 2% de folga). Quem tiver mais da metade disso está eleito, mesmo que todo o resto vá para o adversário.</p>
-      <p><b>Chance e projeção (estimativa).</b> 3.000 simulações. Em cada uma, os votos que faltam em cada estado seguem o padrão do próprio estado, com uma variação aleatória maior onde pouco foi apurado, e uma variação nacional comum a todos.${m.nSame?` No 2º turno, em ${m.nSame} estados o padrão vem da comparação com o 1º turno nas mesmas urnas: o que falta repete o 1º turno daqueles lugares, mais a variação já observada no estado.`:""} Não é pesquisa: só projeta o que o TSE já publicou.</p></details>
+      <p><b>Número mágico (conta exata).</b> Soma os votos válidos já apurados com o teto do que ainda pode entrar: todo eleitor das seções que faltam votando em alguém (mais 2% de folga). Quem tiver mais da metade disso está eleito, mesmo que todo o resto vá para o adversário.</p></details>
   </section>`;
 }
 
@@ -2328,7 +2318,7 @@ function sameHTML(colors){
     <div class="sm-cols">${col("No 1º turno, nestes mesmos lugares",T.t1,T.t1val,oth)}${col("Agora, no 2º turno",T.t2,T.t2val,0)}
       <div class="sm-col"><span class="k">Variação</span>${[A,B].map(c=>`<div class="sm-r"><span><i style="background:${colors[c.n]}"></i>${nm(c)}</span><b style="color:${colors[c.n]}">${pp(dl(c))}</b><span class="k">${dl(c)>=0?"+":"−"}${nf(Math.abs((T.t2[c.n]||0)-(T.t1[c.n]||0)))} votos</span></div>`).join("")}</div></div>
     <details class="mhow"><summary>Por estado (${nm(A)})</summary><div class="scroll"><table class="tbl"><thead><tr><th>Estado</th><th>Municípios</th><th>1º turno</th><th>2º turno</th><th>Variação</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${UFNAME[r.u]}</td><td>${nf(r.b.mun)}</td><td>${pf(r.p1,1)}</td><td>${pf(r.p2,1)}</td><td style="color:${r.d>=0?colors[A.n]:colors[B.n]}">${pp(r.d)}</td></tr>`).join("")}</tbody></table></div></details>
-    <div class="k pmnote">Votos válidos. O 1º turno de cada município entra na mesma proporção do que já foi apurado nele no 2º turno; em município 100% apurado são exatamente as mesmas urnas. Sem o exterior. A chance de vitória acima usa essa variação, estado por estado, para projetar o que falta.</div></section>`;
+    <div class="k pmnote">Votos válidos. O 1º turno de cada município entra na mesma proporção do que já foi apurado nele no 2º turno; em município 100% apurado são exatamente as mesmas urnas. Sem o exterior.</div></section>`;
 }
 function munCardHTML(){
   const live=S.turno===2&&!!D().pres.br?.val, src=munSrc(), uf=MUN.uf;
