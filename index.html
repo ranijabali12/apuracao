@@ -1575,7 +1575,8 @@ async function refresh(){
   try{
     const jobs=[fetchPres().catch(e=>{ S.err=e; }), fetchGov().catch(()=>{})];
     if(S.turno===2) jobs.push(fetchServer().catch(()=>{}));
-    if(S.turno===2 && (D().pres.waiting || !D().pres.br?.val)) jobs.push(fetchBUTSE().catch(()=>{}));
+    /* boletins do exterior correm por fora: centenas de arquivos pequenos, renderizam sozinhos e não seguram a rodada */
+    if(S.turno===2 && (D().pres.waiting || !D().pres.br?.val)) fetchBUTSE().catch(()=>{});
     if(S.cargo==="pres" && S.scope==="ZZ") jobs.push(fetchExt().catch(()=>{}));
     if(S.cargo==="pol" && S.polKind==="gov") jobs.push(polGov2().catch(()=>{}));
     if(S.city && S.cargo==="pres") jobs.push(fetchCity().catch(()=>{}));
