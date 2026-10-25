@@ -919,6 +919,11 @@ body.tv .headline{display:block!important;font-size:clamp(20px,1.8vw,28px);max-w
 .bu-v i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
 .bu-t1{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding:16px;margin:0 0 16px;border-radius:8px;background:var(--line);font-size:14px}
 .bu-t1>b{flex-basis:100%;font-weight:600}
+.same .sm-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:8px 0 16px}
+.same .sm-col{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:8px;background:var(--line)}
+.same .sm-r{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:0 8px}
+.same .sm-r>.k:last-child,.same .sm-r.k>span:last-child{grid-column:1/-1;font-size:12px}
+.same .sm-r i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
 .bu-c1{flex-basis:100%;font-size:12px}
 /* ---------- ajuda de atalhos ---------- */
 .kgrid{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:16px 0 4px;font-size:14px}
@@ -2152,12 +2157,15 @@ function mathModel(main,units,turno){
   const [L,B]=main.cands, two=turno===2||main.cands.length===2;
   const R=Math.max(0,(main.ele||0)*(1-(main.pct||0)/100))*1.02;
   const half=(main.val+R)/2, magic=c=>Math.floor(half-c.votes)+1;
-  const us=(units&&units.length?units:[main]).filter(d=>d&&d.cands).map(d=>{
+  /* 2º turno no Brasil: o que falta em cada estado segue o 1º turno do pedaço que falta + a variação vista nas mesmas urnas */
+  const ufOf=units&&units.length===UFS.length+1?[...UFS,"zz"]:null, same=two&&turno===2&&ufOf?sameT1(L.n,B.n):null;
+  const us=(units&&units.length?units:[main]).map((d,i)=>[d,ufOf?.[i]]).filter(([d])=>d&&d.cands).map(([d,u])=>{
     const f=(d.pct||0)/100, exp=f>=0.005?d.val/f:(d.ele?d.ele*0.79*0.93:0), r=Math.max(0,exp-d.val);
     const sh=c=>d.val?(d.cands.find(x=>x.n===c.n)?.votes||0)/d.val:c.pct/100;
-    return {r,f,sL:sh(L),sB:sh(B),known:f>=0.005}; });
+    const ss=u?sameShare(u,L.n,B.n,same):null;
+    return ss==null?{r,f,sL:sh(L),sB:sh(B),known:f>=0.005}:{r,f,sL:ss,sB:1-ss,known:true,same:true}; });
   const Rexp=us.reduce((a,u)=>a+u.r,0);
-  const key=[main.val,main.pct,Math.round(Rexp),turno,L.n,B.n].join("|");
+  const key=[main.val,main.pct,Math.round(Rexp),turno,L.n,B.n,Math.round(us.reduce((a,u)=>a+u.r*u.sL,0))].join("|");
   let mc=MCM[key];
   if(!mc){
     const r=rng(main.val%2147483647+Math.round((main.pct||0)*1000)), N=3000, fN=(main.pct||0)/100, fin=new Float64Array(N); let wL=0, oL=0;
@@ -2173,7 +2181,7 @@ function mathModel(main,units,turno){
   }
   const doingB=Rexp>0?us.reduce((a,u)=>a+u.r*u.sB,0)/Rexp:null;
   const needB=Rexp>0?(L.votes-B.votes+Rexp)/(2*Rexp):null;
-  return {L,B,two,R,half,mL:magic(L),mB:magic(B),Rexp,mc,needB,doingB,val:main.val,pct:main.pct||0};
+  return {L,B,two,R,half,mL:magic(L),mB:magic(B),Rexp,mc,needB,doingB,val:main.val,pct:main.pct||0,nSame:us.filter(u=>u.same).length};
 }
 const chance = p => p>=0.995?"mais de 99%":p<=0.005?"menos de 1%":Math.round(p*100)+"%";
 /* manchete: a apuração inteira numa frase, refeita a cada atualização */
@@ -2211,7 +2219,7 @@ function mathHTML(main,units,colors,turno,cargo){
   };
   const pW=m.two?m.mc.pWin:m.mc.pOver;
   const viraTxt = m.needB==null?"" : m.needB>1 ? `<b>Pela estimativa, não dá mais.</b> ${nm(m.B)} precisaria de mais de 100% do que falta.`
-    : `${nm(m.B)} precisa de <b style="color:${cB}">${pf(m.needB*100,1)}</b> dos votos que faltam para passar ${nm(m.L)}. Nos lugares onde ainda há voto, vem fazendo <b style="color:${cB}">${pf(m.doingB*100,1)}</b>.`;
+    : `${nm(m.B)} precisa de <b style="color:${cB}">${pf(m.needB*100,1)}</b> dos votos que faltam para passar ${nm(m.L)}. ${m.nSame?"Pela variação nas mesmas urnas, deve fazer":"Nos lugares onde ainda há voto, vem fazendo"} <b style="color:${cB}">${pf(m.doingB*100,1)}</b>.`;
   return `<section class="card math"><h3>A matemática da noite <small>conta exata e estimativa, refeitas a cada atualização</small></h3>
     ${strip}
     <div class="mtiles">${tile(m.L,m.mL,cL)}${tile(m.B,m.mB,cB)}</div>
@@ -2223,7 +2231,7 @@ function mathHTML(main,units,colors,turno,cargo){
     </div>
     <details class="mhow"><summary>Como essas contas são feitas</summary>
       <p><b>Número mágico (conta exata).</b> Soma os votos válidos já apurados com o teto do que ainda pode entrar: todo eleitor das seções que faltam votando em alguém (mais 2% de folga). Quem tiver mais da metade disso está eleito, mesmo que todo o resto vá para o adversário.</p>
-      <p><b>Chance e projeção (estimativa).</b> 3.000 simulações. Em cada uma, os votos que faltam em cada estado seguem o padrão do próprio estado, com uma variação aleatória maior onde pouco foi apurado, e uma variação nacional comum a todos. Não é pesquisa: só projeta o que o TSE já publicou.</p></details>
+      <p><b>Chance e projeção (estimativa).</b> 3.000 simulações. Em cada uma, os votos que faltam em cada estado seguem o padrão do próprio estado, com uma variação aleatória maior onde pouco foi apurado, e uma variação nacional comum a todos.${m.nSame?` No 2º turno, em ${m.nSame} estados o padrão vem da comparação com o 1º turno nas mesmas urnas: o que falta repete o 1º turno daqueles lugares, mais a variação já observada no estado.`:""} Não é pesquisa: só projeta o que o TSE já publicou.</p></details>
   </section>`;
 }
 
@@ -2259,6 +2267,8 @@ let MUNRD=0;
 function munRedraw(){ clearTimeout(MUNRD); MUNRD=setTimeout(()=>drawMun(true),400); }
 async function munSync(){
   if(MUN.syncing || S.turno!==2 || munSrc()!=="live" || !$("#munBox")) return; MUN.syncing=true;
+  if(!MUN.t1d) munT1().then(j=>{ MUN.t1d=j; render(); }).catch(()=>{});
+  if(!MUN.cfgR) munCfg(S.eles[2].fed).then(c=>{ MUN.cfgR=c; }).catch(()=>{});
   const sel=MUN.uf;
   try{ const order=sel?[sel]:[...UFS].sort((a,b)=>(MUN.live[a]?1:0)-(MUN.live[b]?1:0));
     for(const u of order){ if(MUN.uf!==sel) break; if(await munLive(u)) munRedraw(); if(Date.now()<(MUN.pause||0)) break; } }
@@ -2275,6 +2285,50 @@ function munRow(cdi,src,t1){
   if(src==="t1"){ const a=t1?.m?.[cdi]; if(!a||!a[1]) return null; const cs=t1.c.map((n,i)=>({n,votes:a[i+2],pct:a[i+2]/a[1]*100})).sort((x,y)=>y.votes-x.votes); return {pct:a[0],val:a[1],cands:cs,top:cs[0],two:false}; }
   for(const uf in MUN.live){ const d=MUN.live[uf][cdi]; if(d) return d.val?{pct:d.pct,val:d.val,cands:d.cands,top:d.cands[0],two:d.cands.length<=2}:{pct:d.pct,val:0,cands:[],top:null}; }
   return null;
+}
+/* ============ MESMAS URNAS, 1º × 2º TURNO ============
+   Para cada município que já tem voto no 2º turno, pega o resultado final do 1º turno (mun/t1.json) na mesma
+   proporção do que já foi apurado lá. Município com 100% apurado é exatamente o mesmo conjunto de urnas; nos demais
+   supõe que as seções já apuradas se parecem com o resto do município. Daí sai a variação (swing) de cada estado,
+   que a "matemática da noite" usa para projetar o que falta: o 1º turno do pedaço que falta + a variação observada. */
+const SAME={};
+function sameT1(L,B){
+  const t1=MUN.t1d, cfg=MUN.cfgR; if(!t1||!cfg) return null;
+  const ix={}; t1.c.forEach((n,i)=>ix[n]=i+2); const ns=[...new Set([L,B,...t1.c])];
+  const key=[L,B,Object.values(MUN.liveT).join(",")].join("|"); if(SAME.key===key) return SAME.v;
+  const byUF={}, tot={t1:{},t1val:0,t2:{},t2val:0,mun:0,full:0};
+  const add=(o,k,n,v)=>{ o[k][n]=(o[k][n]||0)+v; };
+  for(const [cdi,x] of Object.entries(cfg)){ const a=t1.m[cdi]; if(!a||!a[1]) continue;
+    const u=x.uf, b=byUF[u] ||= {t1:{},t1val:0,t2:{},t2val:0,rest:{},restval:0,mun:0,full:0};
+    const d=MUN.live[u]?.[cdi], f=d&&d.val?clamp((d.pct||0)/100,0,1):0;
+    if(f>0){ b.mun++; tot.mun++; if(f>=1){ b.full++; tot.full++; }
+      for(const n of ns){ if(ix[n]==null) continue; const v=a[ix[n]]*f; add(b,"t1",n,v); add(tot,"t1",n,v); }
+      b.t1val+=a[1]*f; tot.t1val+=a[1]*f;
+      d.cands.forEach(c=>{ add(b,"t2",c.n,c.votes); add(tot,"t2",c.n,c.votes); }); b.t2val+=d.val; tot.t2val+=d.val; }
+    for(const n of [L,B]) if(ix[n]!=null) b.rest[n]=(b.rest[n]||0)+a[ix[n]]*(1-f);
+    b.restval+=a[1]*(1-f); }
+  SAME.key=key; SAME.v={byUF,tot}; return SAME.v;
+}
+/* fatia de L (entre os dois) prevista para o que falta no estado; null = sem base suficiente */
+function sameShare(u,L,B,s){ const b=s?.byUF[u]; if(!b||b.t2val<3000) return null;
+  const l1=b.t1[L]||0, b1=b.t1[B]||0, l2=b.t2[L]||0, b2=b.t2[B]||0, lr=b.rest[L]||0, br=b.rest[B]||0;
+  if(!(l1+b1)||!(l2+b2)||!(lr+br)) return null;
+  return clamp(lr/(lr+br) + (l2/(l2+b2) - l1/(l1+b1)),0,1); }
+function sameHTML(colors){
+  if(S.turno!==2) return ""; const P=D().pres; if(!P.br?.val||P.br.cands.length<2) return "";
+  const [A,B]=P.br.cands, s=sameT1(A.n,B.n);
+  if(!s) return `<section class="card same"><h3>Mesmas urnas, 1º × 2º turno</h3><div class="k">Carregando o 1º turno dos municípios…</div></section>`;
+  const T=s.tot; if(!T.t2val) return `<section class="card same"><h3>Mesmas urnas, 1º × 2º turno</h3><div class="k">Carregando os municípios do 2º turno…</div></section>`;
+  const nm=c=>esc(shortName(c.nm));
+  const col=(lab,o,val,sub)=>`<div class="sm-col"><span class="k">${lab}</span>${[A,B].map(c=>`<div class="sm-r"><span><i style="background:${colors[c.n]}"></i>${nm(c)}</span><b>${pf((o[c.n]||0)/val*100,1)}</b><span class="k">${nf(o[c.n]||0)} votos</span></div>`).join("")}${sub?`<div class="sm-r k"><span>outros</span><b>${pf(sub/val*100,1)}</b><span>${nf(sub)} votos</span></div>`:""}</div>`;
+  const oth=Math.max(0,T.t1val-(T.t1[A.n]||0)-(T.t1[B.n]||0));
+  const dl=c=>(T.t2[c.n]||0)/T.t2val*100-(T.t1[c.n]||0)/T.t1val*100;
+  const rows=UFS.map(u=>{ const b=s.byUF[u]; if(!b||!b.t2val) return null; const p1=(b.t1[A.n]||0)/b.t1val*100, p2=(b.t2[A.n]||0)/b.t2val*100; return {u,b,p1,p2,d:p2-p1}; }).filter(Boolean).sort((x,y)=>y.b.t2val-x.b.t2val);
+  return `<section class="card same"><h3 style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">Mesmas urnas, 1º × 2º turno <small>${nf(T.mun)} municípios com voto apurado · ${nf(T.full)} já completos</small></h3>
+    <div class="sm-cols">${col("No 1º turno, nestes mesmos lugares",T.t1,T.t1val,oth)}${col("Agora, no 2º turno",T.t2,T.t2val,0)}
+      <div class="sm-col"><span class="k">Variação</span>${[A,B].map(c=>`<div class="sm-r"><span><i style="background:${colors[c.n]}"></i>${nm(c)}</span><b style="color:${colors[c.n]}">${pp(dl(c))}</b><span class="k">${dl(c)>=0?"+":"−"}${nf(Math.abs((T.t2[c.n]||0)-(T.t1[c.n]||0)))} votos</span></div>`).join("")}</div></div>
+    <details class="mhow"><summary>Por estado (${nm(A)})</summary><div class="scroll"><table class="tbl"><thead><tr><th>Estado</th><th>Municípios</th><th>1º turno</th><th>2º turno</th><th>Variação</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${UFNAME[r.u]}</td><td>${nf(r.b.mun)}</td><td>${pf(r.p1,1)}</td><td>${pf(r.p2,1)}</td><td style="color:${r.d>=0?colors[A.n]:colors[B.n]}">${pp(r.d)}</td></tr>`).join("")}</tbody></table></div></details>
+    <div class="k pmnote">Votos válidos. O 1º turno de cada município entra na mesma proporção do que já foi apurado nele no 2º turno; em município 100% apurado são exatamente as mesmas urnas. Sem o exterior. A chance de vitória acima usa essa variação, estado por estado, para projetar o que falta.</div></section>`;
 }
 function munCardHTML(){
   const live=S.turno===2&&!!D().pres.br?.val, src=munSrc(), uf=MUN.uf;
@@ -2585,6 +2639,7 @@ function presPage(){
   ${sc==="BR"?headHTML(view,[...UFS,"zz"].map(u=>P.ufs[u]),colors,S.turno):""}
   ${boardHTML(view,colors,false,"br",sc==="BR"?(S.src==="soma"?"Presidente no Brasil, pela soma dos estados":"Presidente no Brasil, total do TSE"):"Presidente, "+title,br,"presidente")}
   ${sc==="BR"?mathHTML(view,[...UFS,"zz"].map(u=>P.ufs[u]),colors,S.turno,"pres"):""}
+  ${sc==="BR"?sameHTML(colors):""}
   ${sc==="BR"?pmHTML():""}
   <div class="main">
     <div class="card center">
