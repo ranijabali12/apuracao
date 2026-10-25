@@ -2411,8 +2411,11 @@ async function fetchBUTSE(){
       const start=X.cur%pend.length, batch=pend.slice(start,start+n).concat(pend.slice(0,Math.max(0,start+n-pend.length)));
       X.cur=start+batch.length;
       let shown=0;
+      /* o 1º turno das seções já lidas vem em paralelo, sem esperar a varredura terminar */
+      let t1run=null; const t1kick=()=>{ if(!t1run) t1run=fetchBUT1().catch(()=>{}).finally(()=>{ t1run=null; render(); }); };
       await pool(batch,X.swept?12:24,async c=>{ const v=await buGet(BU_PL,c.m,c.z,c.s);
-        if(v){ X.secs[c.k]={...c,...v}; if(++shown%10===1){ X.t=Date.now(); render(); } } });
+        if(v){ X.secs[c.k]={...c,...v}; if(++shown%10===1){ X.t=Date.now(); render(); t1kick(); } } });
+      if(t1run) await t1run;
       X.swept=true; X.t=Date.now(); render();
     }
     await fetchBUT1();
