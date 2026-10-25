@@ -917,6 +917,9 @@ body.tv .headline{display:block!important;font-size:clamp(20px,1.8vw,28px);max-w
 .bu-r{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
 .bu-v{display:flex;gap:16px;flex-wrap:wrap}
 .bu-v i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.bu-t1{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding:16px;margin:0 0 16px;border-radius:8px;background:var(--line);font-size:14px}
+.bu-t1>b{flex-basis:100%;font-weight:600}
+.bu-c1{flex-basis:100%;font-size:12px}
 /* ---------- ajuda de atalhos ---------- */
 .kgrid{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:16px 0 4px;font-size:14px}
 kbd{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:7px;background:var(--panel3);font:600 12.5px var(--sans);color:var(--text)}
@@ -2385,34 +2388,61 @@ function buVotes(b){
     k.forEach(x=>walk(x,d+1)); };
   try{ derNodes(b,0,b.length).forEach(n=>walk(n,0)); }catch(e){ return null; }
   return found?r:null; }
+const BU_PL1 = "3220"; /* pleito do 1º turno: comparação nas mesmas seções */
+/* baixa e decodifica o boletim de uma seção; null se ela ainda não transmitiu */
+async function buGet(pl,m,z,s){
+  const dir=`${BASE}/arquivo-urna/${pl}/dados/zz/${m}/${z}/${s}/`;
+  const a=await getJSON(`${dir}p${pad6(pl)}-zz-m${m}-z${z}-s${s}-aux.json`);
+  const h=(a.hashes||[]).find(h=>/receb|totaliz/i.test(h.st||"")&&(h.arq||[]).some(f=>f.tp==="bu")); if(!h) return null;
+  const r=await fetch(dir+h.hash+"/"+h.arq.find(f=>f.tp==="bu").nm); if(!r.ok) return null;
+  return buVotes(new Uint8Array(await r.arrayBuffer()));
+}
+const buSecs=(j,fn)=>(j.abr||[]).forEach(a=>(a.mu||[]).forEach(m=>(m.zon||[]).forEach(z=>(z.sec||[]).forEach(sc=>fn(m,z,sc)))));
 async function fetchBUTSE(){
   const X=BU.tse; if(X.busy) return; X.busy=true;
   try{
-    const root=`${BASE}/arquivo-urna/${BU_PL}`;
-    if(!X.cfg){ const j=await getJSON(`${root}/config/zz/zz-p${pad6(BU_PL)}-cs.json`); X.cfg=[];
-      (j.abr||[]).forEach(a=>(a.mu||[]).forEach(m=>(m.zon||[]).forEach(z=>(z.sec||[]).forEach(sc=>{ if(sc.nsp) return; /* seção agregada: votos no boletim da principal */
-        X.cfg.push({k:`${m.cd}-${z.cd}-${sc.ns}`,m:m.cd,nm:m.nm,z:z.cd,s:sc.ns}); })))); }
+    if(!X.cfg){ const j=await getJSON(`${BASE}/arquivo-urna/${BU_PL}/config/zz/zz-p${pad6(BU_PL)}-cs.json`); X.cfg=[];
+      buSecs(j,(m,z,sc)=>{ if(sc.nsp) return; /* seção agregada: votos no boletim da principal */
+        X.cfg.push({k:`${m.cd}-${z.cd}-${sc.ns}`,m:m.cd,nm:m.nm,z:z.cd,s:sc.ns,a:sc.nsa||[]}); }); }
     /* boletim recebido não muda; a cada rodada confere até 500 seções ainda sem boletim, em rodízio */
-    const pend=X.cfg.filter(c=>!X.secs[c.k]); if(!pend.length) return;
-    const n=X.swept?500:pend.length; /* a primeira rodada confere tudo de uma vez */
-    const start=X.cur%pend.length, batch=pend.slice(start,start+n).concat(pend.slice(0,Math.max(0,start+n-pend.length)));
-    X.cur=start+batch.length;
-    let shown=0;
-    await pool(batch,X.swept?12:24,async c=>{ const dir=`${root}/dados/zz/${c.m}/${c.z}/${c.s}/`;
-      const a=await getJSON(`${dir}p${pad6(BU_PL)}-zz-m${c.m}-z${c.z}-s${c.s}-aux.json`);
-      const h=(a.hashes||[]).find(h=>/receb|totaliz/i.test(h.st||"")&&(h.arq||[]).some(f=>f.tp==="bu")); if(!h) return;
-      const r=await fetch(dir+h.hash+"/"+h.arq.find(f=>f.tp==="bu").nm); if(!r.ok) return;
-      const v=buVotes(new Uint8Array(await r.arrayBuffer())); if(v){ X.secs[c.k]={...c,...v}; if(++shown%10===1){ X.t=Date.now(); render(); } } });
-    X.swept=true;
+    const pend=X.cfg.filter(c=>!X.secs[c.k]);
+    if(pend.length){
+      const n=X.swept?500:pend.length; /* a primeira rodada confere tudo de uma vez */
+      const start=X.cur%pend.length, batch=pend.slice(start,start+n).concat(pend.slice(0,Math.max(0,start+n-pend.length)));
+      X.cur=start+batch.length;
+      let shown=0;
+      await pool(batch,X.swept?12:24,async c=>{ const v=await buGet(BU_PL,c.m,c.z,c.s);
+        if(v){ X.secs[c.k]={...c,...v}; if(++shown%10===1){ X.t=Date.now(); render(); } } });
+      X.swept=true; X.t=Date.now(); render();
+    }
+    await fetchBUT1();
   } finally { X.busy=false; X.t=Date.now(); render(); }
+}
+/* 1º turno das mesmas seções: cada seção do 2º turno (com as agregadas) aponta para a principal do 1º turno que a contém */
+async function fetchBUT1(){
+  const X=BU.tse;
+  if(!X.map1){ const j=await getJSON(`${BASE}/arquivo-urna/${BU_PL1}/config/zz/zz-p${pad6(BU_PL1)}-cs.json`); const m1={};
+    buSecs(j,(m,z,sc)=>{ m1[`${m.cd}-${z.cd}-${sc.ns}`]=`${m.cd}-${z.cd}-${sc.nsp||sc.ns}`; }); X.map1=m1; X.t1={}; }
+  const need=new Set();
+  Object.values(X.secs).forEach(c=>{ c.t1=[c.s,...c.a].map(s=>X.map1[`${c.m}-${c.z}-${s}`]).filter(Boolean); c.t1.forEach(k=>{ if(!(k in X.t1)) need.add(k); }); });
+  if(!need.size) return;
+  await pool([...need],16,async k=>{ const [m,z,s]=k.split("-"); try{ X.t1[k]=await buGet(BU_PL1,m,z,s); }catch(e){ X.t1[k]=null; } });
+}
+/* soma do 1º turno sobre um conjunto de seções do 2º turno (cada principal do 1º turno entra uma vez) */
+function buT1Sum(list){
+  const X=BU.tse; if(!X.t1) return null; const seen=new Set(), v={}, v2={}; let ok=0;
+  list.forEach(c=>{ const ks=c.t1||[]; if(!ks.length||ks.some(k=>!X.t1[k])) return; ok++; Object.entries(c.v).forEach(([n,q])=>v2[n]=(v2[n]||0)+q);
+    ks.forEach(k=>{ if(seen.has(k)) return; seen.add(k); Object.entries(X.t1[k].v).forEach(([n,q])=>v[n]=(v[n]||0)+q); }); });
+  const val=Object.values(v).reduce((t,q)=>t+q,0); return val?{v,val,ok,v2}:null;
 }
 /* países: boletins do TSE quando já há algum; senão o arquivo manual */
 function buPaises(){
   const X=BU.tse, got=Object.values(X.secs);
   if(got.length){ const by={};
-    X.cfg.forEach(c=>{ const co=countryOf(c.nm).name; (by[co] ||= {pais:co,votos:{},sec:0,tot:0}).tot++; });
-    got.forEach(c=>{ const o=by[countryOf(c.nm).name]; o.sec++; Object.entries(c.v).forEach(([n,q])=>o.votos[n]=(o.votos[n]||0)+q); });
-    return {tse:true,sec:got.length,tot:X.cfg.length,t:X.t,paises:Object.values(by).filter(o=>o.sec).map(o=>({...o,completo:o.sec===o.tot}))}; }
+    X.cfg.forEach(c=>{ const co=countryOf(c.nm).name; (by[co] ||= {pais:co,votos:{},sec:0,tot:0,list:[]}).tot++; });
+    got.forEach(c=>{ const o=by[countryOf(c.nm).name]; o.sec++; o.list.push(c); Object.entries(c.v).forEach(([n,q])=>o.votos[n]=(o.votos[n]||0)+q); });
+    const ps=Object.values(by).filter(o=>o.sec).map(o=>({...o,completo:o.sec===o.tot,t1:buT1Sum(o.list)}));
+    return {tse:true,sec:got.length,tot:X.cfg.length,t:X.t,t1:buT1Sum(got),paises:ps}; }
   const d=BU.data; return d&&d.paises.length?{tse:false,paises:d.paises,fonte:d.fonte,at:d.atualizado}:null;
 }
 function buHTML(){
@@ -2422,7 +2452,11 @@ function buHTML(){
   const cs=fin.map(c=>({c,v:tot(c.n)})), val=cs.reduce((t,x)=>t+x.v,0); if(!val) return "";
   cs.sort((a,b)=>b.v-a.v);
   const rows=d.paises.map(x=>{ const v=fin.map(c=>+x.votos?.[c.n]||0), s=v[0]+v[1]; return {x,v,s}; }).filter(r=>r.s).sort((a,b)=>b.s-a.s)
-    .map(r=>`<div class="bu-r"><b>${esc(r.x.pais)}</b>${r.x.completo?"":` <span class="k">${r.x.tot?`${r.x.sec} de ${r.x.tot} seções`:"parcial"}</span>`}<span class="bu-v">${fin.map((c,i)=>`<span><i style="background:${fc[c.n]}"></i>${esc(shortName(c.nm))} ${pf(r.v[i]/r.s*100,1)} <span class="k">(${nf(r.v[i])})</span></span>`).join("")}</span></div>`).join("");
+    .map(r=>`<div class="bu-r"><b>${esc(r.x.pais)}</b>${r.x.completo?"":` <span class="k">${r.x.tot?`${r.x.sec} de ${r.x.tot} seções`:"parcial"}</span>`}<span class="bu-v">${fin.map((c,i)=>`<span><i style="background:${fc[c.n]}"></i>${esc(shortName(c.nm))} ${pf(r.v[i]/r.s*100,1)} <span class="k">(${nf(r.v[i])})</span></span>`).join("")}</span>${r.x.t1?`<span class="k bu-c1">1º turno nestas seções: ${fin.map(c=>`${esc(shortName(c.nm))} ${pf((r.x.t1.v[c.n]||0)/r.x.t1.val*100,1)}`).join(" · ")}</span>`:""}</div>`).join("");
+  /* 1º turno nas mesmas seções: % dos válidos de cada finalista e a variação em pontos */
+  const t1L=(t,cur)=>t?fin.map(c=>{ const p1=(t.v[c.n]||0)/t.val*100, p2=cur(c); const dp=p2-p1;
+    return `<span><i style="background:${fc[c.n]}"></i>${esc(shortName(c.nm))} ${pf(p1,1)} <span class="k">→ ${pf(p2,1)} (${dp>=0?"+":"−"}${Math.abs(dp).toFixed(1).replace(".",",")} p.p.)</span></span>`; }).join(""):"";
+  const t1HTML = d.t1 ? `<div class="bu-t1"><b>No 1º turno, nestas mesmas seções</b><span class="bu-v">${t1L(d.t1,c=>{ const t=fin.reduce((a,f)=>a+(d.t1.v2[f.n]||0),0); return t?(d.t1.v2[c.n]||0)/t*100:0; })}</span>${d.t1.ok<d.sec?`<span class="k">${nf(d.t1.ok)} de ${nf(d.sec)} seções comparadas</span>`:""}</div>` : "";
   const np=d.paises.length, nps=np===1?"1 país":np+" países";
   const note = d.tse
     ? `Soma dos boletins de urna que o TSE já publicou: ${nf(d.sec)} de ${nf(d.tot)} seções do exterior, em ${nps}. Atualizado às ${hhmm(d.t)}.`
@@ -2430,6 +2464,7 @@ function buHTML(){
   return `<div class="card bu"><h3 style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">Exterior antes das 17h <small>boletins de urna · não é a apuração oficial</small></h3>
     <div class="pmrow">${cs.map(o=>`<div class="pmc" style="--c:${fc[o.c.n]}"><span class="k">${esc(shortName(o.c.nm))}</span><b>${pf(o.v/val*100,1)}</b><span class="k">${nf(o.v)} votos</span></div>`).join("")}</div>
     <div class="pmbar">${cs.map(o=>`<i style="width:${(o.v/val*100).toFixed(1)}%;background:${fc[o.c.n]}"></i>`).join("")}</div>
+    ${t1HTML}
     ${rows}
     <div class="k pmnote">${note} Votos válidos. Às 17h entram os dados oficiais do TSE.</div></div>`;
 }
