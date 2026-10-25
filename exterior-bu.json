@@ -1,0 +1,7 @@
+{
+  "atualizado": "2026-10-25T03:20:00-03:00",
+  "fonte": "Poder360, com base nos boletins de urna",
+  "paises": [
+    { "pais": "Nova Zelândia", "votos": { "13": 418, "22": 101 }, "completo": true }
+  ]
+}
