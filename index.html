@@ -2366,20 +2366,21 @@ function buLoad(){ if(BU.loading||Date.now()-BU.t<60000) return; BU.loading=true
 function derNodes(b,s,e){ const out=[]; let i=s;
   while(i<e){ const t=b[i++]; let tag=t&31; if(tag===31){ tag=0; let x; do{ x=b[i++]; tag=tag*128+(x&127); }while(x&128); }
     let len=b[i++]; if(len===undefined) throw 0; if(len&128){ const n=len&127; if(!n||n>4) throw 0; len=0; for(let k=0;k<n;k++) len=len*256+b[i++]; }
-    if(i+len>e) throw 0; out.push({con:!!(t&32),tag,s:i,e:i+len}); i+=len; }
+    if(i+len>e) throw 0; out.push({cls:t>>6,con:!!(t&32),tag,s:i,e:i+len}); i+=len; }
   return out; }
 const derInt=(b,n)=>{ let v=0; for(let i=n.s;i<n.e;i++) v=v*256+b[i]; return v; };
-/* acha os TotalVotosVotavel {tipoVoto [0], quantidadeVotos [1], identificacaoVotavel [2] {partido [0], codigo [1]}}.
-   O boletim vem dentro de um envelope (OCTET STRING), então conteúdo primitivo longo também é aberto. */
+/* acha os TotalVotosVotavel do boletim: {tipoVoto [1], quantidadeVotos [2], identificacaoVotavel [3] {partido, codigo, ...}, assinatura}.
+   tipoVoto 1 = nominal, 3 = branco, 4 = nulo. O boletim vem dentro de um envelope (OCTET STRING), então conteúdo primitivo longo também é aberto. */
 function buVotes(b){
   const r={v:{},br:0,nu:0}; let found=false;
   const kids=n=>{ if(n.con) return derNodes(b,n.s,n.e); if(n.e-n.s<24) return null; try{ const k=derNodes(b,n.s,n.e); return k.length&&k[0].con?k:null; }catch(e){ return null; } };
-  const walk=(n,d)=>{ if(d>14) return; let k; try{ k=kids(n); }catch(e){ return; } if(!k) return;
-    const t0=k.find(x=>!x.con&&x.tag===0), t1=k.find(x=>!x.con&&x.tag===1), t2=k.find(x=>x.con&&x.tag===2);
-    if(n.con&&t0&&t1&&k.length<=4&&t0.e-t0.s===1&&t1.e-t1.s<=4){ const tipo=derInt(b,t0), q=derInt(b,t1);
-      if(tipo===1&&t2){ let id; try{ id=derNodes(b,t2.s,t2.e); }catch(e){} const c=id?.find(x=>!x.con&&x.tag===1); if(c){ const cd=String(derInt(b,c)); r.v[cd]=(r.v[cd]||0)+q; found=true; return; } }
-      if(tipo===3&&!t2){ r.br+=q; found=true; return; }
-      if(tipo===4&&!t2){ r.nu+=q; found=true; return; } }
+  const ctx=(k,tag,con)=>k.find(x=>x.cls===2&&x.tag===tag&&x.con===con);
+  const walk=(n,d)=>{ if(d>16) return; let k; try{ k=kids(n); }catch(e){ return; } if(!k) return;
+    const t1=ctx(k,1,false), t2=ctx(k,2,false), t3=ctx(k,3,true);
+    if(n.con&&t1&&t2&&t1.e-t1.s===1&&t2.e-t2.s<=4){ const tipo=derInt(b,t1), q=derInt(b,t2);
+      if(tipo===1&&t3){ let id; try{ id=derNodes(b,t3.s,t3.e).filter(x=>x.cls===0&&x.tag===2); }catch(e){} if(id&&id.length>=2){ const cd=String(derInt(b,id[1])); r.v[cd]=(r.v[cd]||0)+q; found=true; return; } }
+      if(tipo===3&&!t3){ r.br+=q; found=true; return; }
+      if(tipo===4&&!t3){ r.nu+=q; found=true; return; } }
     k.forEach(x=>walk(x,d+1)); };
   try{ derNodes(b,0,b.length).forEach(n=>walk(n,0)); }catch(e){ return null; }
   return found?r:null; }
